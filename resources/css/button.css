@@ -1,0 +1,75 @@
+/* Button base styles */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-radius: 6px;
+    min-width: 140px;
+}
+
+.btn:focus {
+    outline: 2px solid #BE3144;
+    outline-offset: 2px;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Sign Up Button Specific Styles */
+.btn-signup {
+    background-color: rgba(255, 255, 255, 0);
+    color: white;
+    padding: 5px 15px;
+    font-size: 15px;
+    min-width: 20px;
+    border: 2px solid #BE3144;
+}
+
+.btn-signup:hover {
+    background-color: #A52C3A;
+    transform: translateY(-1px);
+}
+
+.btn-signup:active {
+    transform: translateY(0);
+}
+
+/* Primary Button Styles */
+.btn-primary {
+    background-color: #BE3144;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #A52C3A;
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Secondary Button Styles */
+.btn-secondary {
+    background-color: transparent;
+    color: black;
+    border: 2px solid #BE3144;
+}
+
+.btn-secondary:hover {
+    background-color: #BE3144;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+}

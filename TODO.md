@@ -1,0 +1,1 @@
+- [x] Modify package card in Booking.tsx to display description when selected
