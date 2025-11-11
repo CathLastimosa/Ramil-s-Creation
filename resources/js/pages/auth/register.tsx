@@ -1,12 +1,12 @@
-import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button-shad';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { Head, useForm } from '@inertiajs/react';
+import { LoaderCircle } from 'lucide-react';
+import { FormEventHandler, useEffect } from 'react';
 
 type RegisterForm = {
     name: string;
@@ -23,7 +23,10 @@ export default function Register() {
         password_confirmation: '',
     });
 
-    return null;
+    // Force light mode on register page
+    useEffect(() => {
+        document.documentElement.classList.remove('dark');
+    }, []);
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         post(route('register'), {
@@ -101,7 +104,7 @@ export default function Register() {
                         <InputError message={errors.password_confirmation} />
                     </div>
 
-                    <Button type="submit" className="mt-2 w-full bg-brand-primary" tabIndex={5} disabled={processing}>
+                    <Button type="submit" className="bg-brand-primary mt-2 w-full" tabIndex={5} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Create account
                     </Button>

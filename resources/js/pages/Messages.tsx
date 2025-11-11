@@ -10,8 +10,8 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import debounce from 'lodash/debounce';
-import { Loader2, Search, Send, SquarePen, Trash2, User, Users } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Search, Send, SquarePen, Trash2, User, Users } from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Messages', href: '/messages' }];
@@ -236,10 +236,10 @@ export default function Messages() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Messages" />
 
-            <div className="flex items-center justify-between border-b border-muted p-4">
-                <div className="flex items-center gap-4">
+            <div className="flex flex-col gap-4 border-b border-muted p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4">
                     <Select value={filter} onValueChange={(value: 'inbox' | 'sent') => setFilter(value)}>
-                        <SelectTrigger className="w-32">
+                        <SelectTrigger className="w-full sm:w-32">
                             <SelectValue placeholder="Filter" />
                         </SelectTrigger>
                         <SelectContent>
@@ -260,7 +260,11 @@ export default function Messages() {
                     </div>
                 </div>
 
-                <Button variant="brand" className="flex items-center gap-1" onClick={() => router.visit(route('messages.create'))}>
+                <Button
+                    variant="brand"
+                    className="flex w-full items-center justify-center gap-1 sm:w-auto"
+                    onClick={() => router.visit(route('messages.create'))}
+                >
                     <SquarePen className="mr-2 h-4 w-4" />
                     Send Message via Email
                 </Button>
@@ -280,8 +284,8 @@ export default function Messages() {
                 </div>
             ) : (
                 <Tabs defaultValue={defaultTab} orientation="vertical" className="h-[calc(100vh-10rem)] w-full">
-                    <div className="grid h-full grid-cols-[320px_1fr]">
-                        <TabsList className="border-gray max-h-full w-[320px] flex-col justify-start gap-2 overflow-y-auto border-r bg-transparent px-3 py-2">
+                    <div className="grid h-full grid-cols-1 md:grid-cols-[320px_1fr]">
+                        <TabsList className="border-gray max-h-full w-full flex-col justify-start gap-2 overflow-y-auto border-r bg-transparent px-3 py-2 md:w-[320px]">
                             {filteredGroups.map((group) => {
                                 // Find the latest message in the group
                                 const latestMessage = group.messages.reduce(

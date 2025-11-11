@@ -1,1 +1,7 @@
-- [x] Modify package card in Booking.tsx to display description when selected
+- [ ] Make top section responsive: Adjust TabsList to be scrollable on mobile, ensure search and add button stack properly.
+- [ ] Update AccordionTrigger: Stack elements vertically on small screens.
+- [ ] Adjust AccordionContent grid: Already has md:grid-cols-2, but reduce gaps on mobile.
+- [ ] Package summary grid: Already responsive, but ensure text sizes adjust.
+- [ ] Selected services: Hide scroll buttons on mobile or make them smaller.
+- [ ] AccordionFooter: Stack actions vertically on mobile.
+- [ ] General: Reduce padding and margins on mobile, use responsive classes like sm:, md:.

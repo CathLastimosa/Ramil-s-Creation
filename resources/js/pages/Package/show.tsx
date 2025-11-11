@@ -97,10 +97,10 @@ export default function Package({ packages }: { packages: PackageType[] }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Packages" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4 md:overflow-x-visible">
                 <CardTitle>Packages</CardTitle>
                 <CardDescription className="mb-2">You can manage packages here.</CardDescription>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="relative w-full sm:w-1/3">
                         <Input id="search" className="peer ps-9" placeholder="Search Package" type="search" onChange={onSearchChange} />
                         <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3 text-muted-foreground/80">
@@ -108,8 +108,8 @@ export default function Package({ packages }: { packages: PackageType[] }) {
                         </div>
                     </div>
 
-                    <Button asChild variant="brand" className="flex items-center gap-1">
-                        <Link href="package/create" prefetch={true}>
+                    <Button asChild variant="brand" className="flex w-full items-center justify-center gap-1 sm:w-auto">
+                        <Link href={route('package.create')} prefetch={true}>
                             <Plus className="h-4 w-4" />
                             Add Package
                         </Link>
@@ -140,7 +140,7 @@ export default function Package({ packages }: { packages: PackageType[] }) {
                                     <TableCell>₱{Number(pkg.discounted_price || 0).toLocaleString('en-US')}</TableCell>
                                     <TableCell>
                                         <Button asChild size="sm" variant="link" className="underline">
-                                            <Link href={`package/${pkg.package_id}/show-services`} prefetch={true}>
+                                            <Link href={route('package.showServices', pkg.package_id)} prefetch={true}>
                                                 View Services
                                             </Link>
                                         </Button>
@@ -167,7 +167,7 @@ export default function Package({ packages }: { packages: PackageType[] }) {
                                         </Select>
                                     </TableCell>
 
-                                    <TableCell className="flex space-x-3">
+                                    <TableCell className="flex flex-wrap gap-2">
                                         <Tooltip>
                                             <TooltipTrigger>
                                                 <Eye

@@ -108,15 +108,15 @@ export default function ShowServices(props: Props) {
     return (
         <div>
             <div className="flex flex-col gap-4">
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                         <Typography>Services for {pkg.package_name}</Typography>
                         <CardDescription className="mb-6">{pkg.package_description}</CardDescription>
                     </div>
-                    <div>
+                    <div className="flex justify-center sm:justify-end">
                         <Dialog>
                             <DialogTrigger asChild>
-                                <Button variant="brand" className="flex items-center gap-2">
+                                <Button variant="brand" className="flex w-full items-center gap-2 sm:w-auto">
                                     <PlusIcon className="h-4 w-4" />
                                     Add Services
                                 </Button>
@@ -168,11 +168,11 @@ export default function ShowServices(props: Props) {
                 </div>
 
                 {props.services.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
                         {props.services.map((service) => (
                             <div
                                 key={service.services_id}
-                                className="relative w-[210px] overflow-hidden rounded-2xl border shadow-md transition-all hover:shadow-xl"
+                                className="relative mx-auto w-full max-w-[210px] overflow-hidden rounded-2xl border shadow-md transition-all hover:shadow-xl"
                             >
                                 <div className="flex h-[150px] w-full items-center justify-center overflow-hidden bg-gray-100">
                                     <img
@@ -188,7 +188,7 @@ export default function ShowServices(props: Props) {
                                         {service.description || 'This service contains a variety of options to suit your needs.'}
                                     </CardDescription>
 
-                                    <div className="flex justify-center gap-2 p-2">
+                                    <div className="flex flex-col gap-2 p-2 sm:flex-row sm:justify-center">
                                         <Dialog
                                             open={editingService?.services_id === service.services_id}
                                             onOpenChange={(open) => {
@@ -206,7 +206,7 @@ export default function ShowServices(props: Props) {
                                             }}
                                         >
                                             <DialogTrigger asChild>
-                                                <Button variant="secondary" className="w-20">
+                                                <Button variant="secondary" className="w-full sm:w-20">
                                                     <Pencil className="mr-1 h-4 w-4" />
                                                     Edit
                                                 </Button>
@@ -262,7 +262,11 @@ export default function ShowServices(props: Props) {
                                         </Dialog>
 
                                         {/* DELETE */}
-                                        <Button variant="link" onClick={() => confirmDelete(pkg.package_id, service.services_id)}>
+                                        <Button
+                                            variant="link"
+                                            className="w-full sm:w-auto"
+                                            onClick={() => confirmDelete(pkg.package_id, service.services_id)}
+                                        >
                                             Delete
                                         </Button>
                                     </div>

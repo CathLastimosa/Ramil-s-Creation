@@ -5,7 +5,7 @@ const Footer: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     return (
-        <footer id="footer" className="relative bg-transparent pt-12 pb-8">
+        <footer id="footer" className="relative bg-transparent pt-16 pb-8 lg:pt-12">
             {/* Red line indicator */}
             <div className="mx-auto mt-12 mb-12 h-0.5 w-[80%] rounded-full bg-red-600"></div>
 
@@ -48,27 +48,27 @@ const Footer: React.FC = () => {
                         <h4 className="body-medium font-logo font-semibold text-black">Menu</h4>
                         <ul className="body-small grid grid-cols-2 gap-y-1">
                             <li>
-                                <Link href="/home" className="font-heading text-gray-700 transition-colors hover:text-red-500">
+                                <Link href="/" className="font-heading text-gray-700 transition-colors hover:text-red-500">
                                     Home
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/home#services" className="font-heading text-gray-700 transition-colors hover:text-red-500">
+                                <Link href="/#services" className="font-heading text-gray-700 transition-colors hover:text-red-500">
                                     Services
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/home#packages" className="font-heading text-gray-700 transition-colors hover:text-red-500">
+                                <Link href="/#packages" className="font-heading text-gray-700 transition-colors hover:text-red-500">
                                     Packages
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/home#about" className="font-heading text-gray-700 transition-colors hover:text-red-500">
+                                <Link href="/#about" className="font-heading text-gray-700 transition-colors hover:text-red-500">
                                     About Us
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/home#reviews" className="font-heading text-gray-700 transition-colors hover:text-red-500">
+                                <Link href="/#reviews" className="font-heading text-gray-700 transition-colors hover:text-red-500">
                                     Reviews
                                 </Link>
                             </li>
@@ -113,10 +113,8 @@ const Footer: React.FC = () => {
                                 onClick={(e) => {
                                     e.preventDefault();
                                     const email = '25catswhisker@gmail.com';
-                                    const subject = 'Inquiry about Event Booking';
-                                    const body = 'Hello, I would like to ask about...';
-                                    const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                                    const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                                    const mailtoLink = `mailto:${email}`;
+                                    const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}`;
 
                                     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 

@@ -16,7 +16,7 @@ class BookingVerificationController extends Controller
     {
 
         if ($booking->email_verified_at) {
-            return redirect('/home')->with('message', 'Email already verified.');
+            return redirect('/')->with('message', 'Email already verified.');
         }
 
         $booking->update(['email_verified_at' => now()]);
@@ -35,7 +35,7 @@ class BookingVerificationController extends Controller
 
         SendBookingSuccessfulNotification::dispatch($booking, $notification->id);
 
-        return redirect('/home')->with('success', [
+        return redirect('/')->with('success', [
             'message' => 'Thank you for choosing Ramils Creation!',
             'booking' => [
                 'event_name' => $booking->event_name,

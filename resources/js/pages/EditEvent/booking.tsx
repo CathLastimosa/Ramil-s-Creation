@@ -166,7 +166,7 @@ export default function EditBooking({
                                         mode="single"
                                         selected={date}
                                         onSelect={setDate}
-                                        className="rounded-lg border shadow-sm"
+                                        className="mt-3 h-100 w-80 rounded-lg border lg:h-95 lg:w-75"
                                         captionLayout="dropdown"
                                         disabled={(day) => {
                                             const today = new Date();
@@ -260,12 +260,12 @@ export default function EditBooking({
                                                                         isUnavailable
                                                                             ? 'ghost'
                                                                             : selectedSlot === currentIdx
-                                                                              ? 'secondary'
+                                                                              ? 'brand2'
                                                                               : 'outline'
                                                                     }
                                                                     className={`p-2 text-sm ${
                                                                         isUnavailable ? 'cursor-not-allowed text-gray-400 line-through' : ''
-                                                                    } ${selectedSlot === currentIdx && !isUnavailable ? 'text-brand-primary' : ''}`}
+                                                                    } ${selectedSlot === currentIdx && !isUnavailable ? 'text-white' : ''}`}
                                                                     disabled={isUnavailable}
                                                                     onClick={() => {
                                                                         if (!isUnavailable) {
@@ -332,7 +332,6 @@ export default function EditBooking({
                             Cancel
                         </Button>
                         <Button type="submit">
-                        <Save />
                         Save Changes</Button>
                     </div>
                 </form>

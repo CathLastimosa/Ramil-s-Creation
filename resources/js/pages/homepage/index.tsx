@@ -52,6 +52,10 @@ const Homepage = () => {
     }>().props;
 
     useEffect(() => {
+        document.documentElement.classList.remove('dark');
+    }, []);
+
+    useEffect(() => {
         console.log('Packages in Homepage:', packages);
     }, [packages]);
 

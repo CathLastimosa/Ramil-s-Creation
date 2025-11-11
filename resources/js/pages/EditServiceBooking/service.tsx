@@ -187,7 +187,7 @@ export default function EditServiceBooking({
                                         mode="single"
                                         selected={date}
                                         onSelect={setDate}
-                                        className="rounded-lg border shadow-sm"
+                                        className="mt-3 h-100 w-80 rounded-lg border lg:h-95 lg:w-75"
                                         captionLayout="dropdown"
                                         disabled={(day) => {
                                             const today = new Date();
@@ -278,15 +278,11 @@ export default function EditServiceBooking({
                                                                     key={currentIdx}
                                                                     type="button"
                                                                     variant={
-                                                                        isUnavailable
-                                                                            ? 'ghost'
-                                                                            : selectedSlot === currentIdx
-                                                                              ? 'alternative'
-                                                                              : 'outline'
+                                                                        isUnavailable ? 'ghost' : selectedSlot === currentIdx ? 'brand2' : 'outline'
                                                                     }
                                                                     className={`p-2 text-sm ${
                                                                         isUnavailable ? 'cursor-not-allowed text-gray-400 line-through' : ''
-                                                                    } ${selectedSlot === currentIdx && !isUnavailable ? 'text-brand-primary' : ''}`}
+                                                                    } ${selectedSlot === currentIdx && !isUnavailable ? 'text-white' : ''}`}
                                                                     disabled={isUnavailable}
                                                                     onClick={() => {
                                                                         if (!isUnavailable) {
@@ -333,11 +329,12 @@ export default function EditServiceBooking({
                             </div>
                         </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <Button type="submit">Update Service Booking</Button>
-                        <Button type="button" variant="outline" onClick={() => router.visit(route('service-bookings.index'))}>
+                    <div className="flex items-center gap-2 justify-end">
+                        <Button type="button" variant="secondary" onClick={() => router.visit(route('service-bookings.index'))}>
                             Cancel
                         </Button>
+                        <Button type="submit">Update Service Booking</Button>
+                        
                     </div>
                 </form>
             </div>

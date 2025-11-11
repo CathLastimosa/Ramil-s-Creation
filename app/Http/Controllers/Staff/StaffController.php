@@ -144,18 +144,6 @@ class StaffController extends Controller
         return redirect()->route('staff.index')->with('success', 'Staff updated successfully.');
     }
 
-    public function updateStatus(Request $request, $id)
-    {
-        $request->validate([
-            'status' => 'required|string|in:active,inactive',
-        ]);
-
-        $staff = Staff::findOrFail($id);
-        $staff->update(['status' => $request->status]);
-
-        return back()->with('success', 'Staff status updated successfully.');
-    }
-
     /**
      * Remove the specified resource from storage.
      */
@@ -172,23 +160,20 @@ class StaffController extends Controller
      */
     private function convertTo24HourTime(string $timeStr): ?string
     {
-        // Parse the input: e.g., "07:00 AM" or "8:30 PM"
         if (preg_match('/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i', $timeStr, $matches)) {
             $hour = (int) $matches[1];
             $minute = (int) $matches[2];
             $ampm = strtoupper($matches[3]);
 
-            // Adjust hour for PM (except 12 PM)
             if ($ampm === 'PM' && $hour !== 12) {
                 $hour += 12;
             } elseif ($ampm === 'AM' && $hour === 12) {
                 $hour = 0;
             }
 
-            // Format as HH:MM:SS
             return sprintf('%02d:%02d:00', $hour, $minute);
         }
 
-        return null; // Invalid format
+        return null; 
     }
 }

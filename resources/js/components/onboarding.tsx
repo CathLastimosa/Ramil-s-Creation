@@ -20,7 +20,7 @@ export default function Onboarding() {
     const stepContent = [
         {
             title: 'Important Reminder',
-            description: 'You should book your event at least one month before the event date to ensure availability and smooth preparation.',
+            description: 'You should book your event at least three (3) months before the event date to ensure availability and smooth preparation.',
         },
         {
             title: 'No Cancellation of bookings',

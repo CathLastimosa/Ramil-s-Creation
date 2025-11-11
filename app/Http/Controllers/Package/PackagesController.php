@@ -1,16 +1,16 @@
 <?php
 
 namespace App\Http\Controllers\Package;
+
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Package\StorePackageRequest;
 use App\Http\Requests\Package\UpdatePackageRequest;
 use App\Http\Requests\Package\UpdateStatusRequest;
+use App\Jobs\SendPromoAnnouncementJob;
 use App\Models\Bookings;
 use App\Models\Package;
 use App\Models\Services;
-use App\Notifications\PromoAnnouncement;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -65,7 +65,7 @@ class PackagesController extends Controller
      */
     public function save()
     {
-        $packageData = session('package'); 
+        $packageData = session('package');
         $servicesData = session('services', []);
         $servicesCount = count($servicesData);
 
@@ -149,7 +149,7 @@ class PackagesController extends Controller
                 ->toArray();
 
             if (! empty($emails)) {
-                Notification::route('mail', $emails)->notifyNow(new PromoAnnouncement($package));
+                SendPromoAnnouncementJob::dispatch($package, $emails);
                 $sentCount = count($emails);
             } else {
                 $sentCount = 0;
@@ -246,7 +246,7 @@ class PackagesController extends Controller
     {
         $package = Package::where('package_id', $id)->firstOrFail();
 
-        $services = $package->services; 
+        $services = $package->services;
 
         foreach ($services as $service) {
             if (! empty($service->image) && Storage::disk('public')->exists($service->image)) {

@@ -17,8 +17,6 @@ class Appointments extends Model
 
     protected $fillable = [
         'appointment_id',
-        'booking_id',
-        'customer_id',
         'contact_name',
         'contact_email',
         'contact_phone',
@@ -27,8 +25,6 @@ class Appointments extends Model
         'appointment_time_from',
         'appointment_time_to',
         'status',
-        'verification_token',
-        'email_verified_at',
     ];
 
     public function routeNotificationForMail($notification)

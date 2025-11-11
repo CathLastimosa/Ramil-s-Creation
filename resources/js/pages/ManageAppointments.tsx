@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button-shad';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/app-layout';
 import { Head, router, usePage } from '@inertiajs/react';
 import { CardContent } from '@mui/material';
@@ -67,9 +66,9 @@ export default function ManageAppointments({ appointments }: { appointments: Pag
                 <CardTitle>Appointments</CardTitle>
                 <CardDescription>You can manage appointments here.</CardDescription>
                 <Tabs defaultValue="all" className="items-left">
-                    <div className="mt-4 flex items-center justify-between">
+                    <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         {/* Tabs */}
-                        <TabsList>
+                        <TabsList className="w-full overflow-x-auto sm:w-auto">
                             <TabsTrigger className="data-[state=active]:text-background" value="all">
                                 All
                             </TabsTrigger>
@@ -81,9 +80,9 @@ export default function ManageAppointments({ appointments }: { appointments: Pag
                             </TabsTrigger>
                         </TabsList>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                             {/* Search */}
-                            <div className="relative ml-4 max-w-md">
+                            <div className="relative max-w-md">
                                 <Input id="search" className="peer ps-9" placeholder="Search Appointments" type="search" onChange={onSearchChange} />
                                 <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3 text-muted-foreground/80">
                                     <Search size={16} aria-hidden="true" />
@@ -96,7 +95,7 @@ export default function ManageAppointments({ appointments }: { appointments: Pag
                                 onClick={() => router.visit(route('adminappointments.create'))}
                             >
                                 <PlusIcon className="opacity-60 sm:-ms-1" size={16} aria-hidden="true" />
-                                <span className="max-sm:sr-only">Add Appointment</span>
+                                Add Appointment
                             </Button>
                         </div>
                     </div>
@@ -176,8 +175,8 @@ function AppointmentAccordion({ appointments, confirmDelete }: { appointments: A
                     className="mb-3 overflow-hidden rounded-xl border shadow-sm"
                 >
                     <AccordionTrigger className="p-4">
-                        <div className="flex w-full items-center justify-between">
-                            <div className="flex items-center gap-3">
+                        <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                                 <span className="font-semibold text-gray-900">{appointment.purpose}</span>
                                 <Badge
                                     variant="outline"
@@ -203,7 +202,7 @@ function AppointmentAccordion({ appointments, confirmDelete }: { appointments: A
                                     {appointment.status}
                                 </Badge>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-center sm:justify-end">
                                 <span className="rounded-xl bg-slate-200 px-3 py-3 text-sm font-medium text-slate-900">
                                     {formatDateToWords(appointment.appointment_date)}
                                     <span className="text-slate-300"> | </span>
@@ -213,7 +212,7 @@ function AppointmentAccordion({ appointments, confirmDelete }: { appointments: A
                         </div>
                     </AccordionTrigger>
 
-                    <AccordionContent className="bg-gray-50/70 px-6 py-4">
+                    <AccordionContent className="bg-gray-50/70 p-4 sm:px-6 sm:py-4 dark:from-black dark:to-black">
                         <Card className="overflow-hidden border border-gray-200/70 shadow-sm transition-shadow duration-300 hover:shadow-md">
                             <CardHeader className="flex items-center gap-2 border-b border-gray-200 bg-gray-50/70 px-6 py-4">
                                 <CalendarCheck className="h-5 w-5 text-purple-600" />
@@ -236,7 +235,7 @@ function AppointmentAccordion({ appointments, confirmDelete }: { appointments: A
                         </Card>
                     </AccordionContent>
 
-                    <AccordionFooter className="flex w-full items-center justify-between gap-3">
+                    <AccordionFooter className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-10">
                             <div className="flex items-center space-x-1">
                                 <div className="p-2">
@@ -264,41 +263,27 @@ function AppointmentAccordion({ appointments, confirmDelete }: { appointments: A
                                         }}
                                     >
                                         <CheckIcon className="text-green-500" />
-                                        <strong>Completed ?</strong>
+                                        <span className="max-sm:sr-only">Completed ?</span>
                                     </Button>
                                 )}
                             </div>
                         </div>
-                        <div className="flex gap-3">
-                            {/* Actions */}
-                            <div className="flex">
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button asChild variant="link" className="mr-3 flex cursor-pointer" onClick={() => handleEdit(appointment)}>
-                                            <span>
-                                                <Pencil size={20} className="mr-1 text-yellow-600 hover:text-gray-800" />
-                                                <CardDescription>Edit</CardDescription>
-                                            </span>
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>Edit Appointment</TooltipContent>
-                                </Tooltip>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            asChild
-                                            variant="link"
-                                            className="mr-3 flex cursor-pointer"
-                                            onClick={() => handleDeleteAppointment(appointment.appointment_id)}
-                                        >
-                                            <span>
-                                                <Trash className="size={16} text-red-600 hover:text-gray-800" aria-hidden="true" />
-                                                <CardDescription>Delete</CardDescription>
-                                            </span>
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>Delete Appointment</TooltipContent>
-                                </Tooltip>
+                        <div className="flex gap-1">
+                            <div>
+                                <Button variant="link" className="aspect-square cursor-pointer max-sm:p-0" onClick={() => handleEdit(appointment)}>
+                                    <Pencil className="text-yellow-600 opacity-60 hover:text-gray-800 sm:-ms-1" size={16} aria-hidden="true" />
+                                    <span className="max-sm:sr-only">Edit</span>
+                                </Button>
+                            </div>
+                            <div>
+                                <Button
+                                    variant="link"
+                                    className="aspect-square cursor-pointer max-sm:p-0"
+                                    onClick={() => handleDeleteAppointment(appointment.appointment_id)}
+                                >
+                                    <Trash className="text-red-600 opacity-60 hover:text-gray-800 sm:-ms-1" aria-hidden="true" />
+                                    <span className="max-sm:sr-only">Delete</span>
+                                </Button>
                             </div>
                         </div>
                     </AccordionFooter>

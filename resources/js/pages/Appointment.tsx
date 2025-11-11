@@ -23,7 +23,7 @@ import { router, useForm, usePage } from '@inertiajs/react';
 import { Box, Button, MobileStepper, Step, StepButton, StepConnector, StepIconProps, StepLabel, Stepper, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import React, { useEffect, useId, useRef, useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { toast } from 'sonner';
@@ -181,6 +181,16 @@ export default function MultiStepForm() {
         });
     };
 
+    const validateEmail = (email: string): boolean => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const validatePhone = (phone: string): boolean => {
+        const digits = phone.replace(/\D/g, '');
+        return digits.length >= 10;
+    };
+
     const validateStep = (step: number): boolean => {
         switch (step) {
             case 0:
@@ -188,7 +198,7 @@ export default function MultiStepForm() {
             case 1:
                 return !!date && selectedSlot !== null;
             case 2:
-                return [data.fullName, data.email, data.phone].every((field) => !!field);
+                return [data.fullName, data.email, data.phone].every((field) => !!field) && validateEmail(data.email) && validatePhone(data.phone);
             case 3:
                 return true;
             default:
@@ -204,421 +214,438 @@ export default function MultiStepForm() {
 
     return (
         <>
-            <Shadcn variant="ghost" onClick={() => router.get(route('home.index'))} className="mt-10 ml-4 md:ml-10 mb-0 underline underline-offset-4">
+            <Shadcn variant="ghost" onClick={() => router.get(route('home.index'))} className="mt-10 mb-0 ml-4 underline underline-offset-4 md:ml-10">
                 <ChevronLeft /> Back to Home
             </Shadcn>
-        <Box sx={{ width: { xs: '100%', sm: '94%', md: '85%', lg: '80%' }, p: 3, mx: 'auto' }}>
-            {/* Stepper Navigation */}
-            <Stepper activeStep={activeStep} orientation={stepperOrientation} connector={<StepConnector />} sx={{ mb: 4 }}>
-                {steps.map((label, index) => (
-                    <Step key={label}>
-                        <StepButton color="inherit" onClick={handleStep(index)}>
-                            <StepLabel StepIconComponent={PinkStepIcon}>{label}</StepLabel>
-                        </StepButton>
-                    </Step>
-                ))}
-            </Stepper>
-            <Toaster richColors position="top-center" />
+            <Box sx={{ width: { xs: '100%', sm: '94%', md: '85%', lg: '80%' }, p: 3, mx: 'auto' }}>
+                {/* Stepper Navigation */}
+                <Stepper activeStep={activeStep} orientation={stepperOrientation} connector={<StepConnector />} sx={{ mb: 4 }}>
+                    {steps.map((label, index) => (
+                        <Step key={label}>
+                            <StepButton color="inherit" onClick={handleStep(index)}>
+                                <StepLabel StepIconComponent={PinkStepIcon}>{label}</StepLabel>
+                            </StepButton>
+                        </Step>
+                    ))}
+                </Stepper>
+                <Toaster richColors position="top-center" />
 
-            <form id="appointmentForm" onSubmit={handleSubmit} className="pb-20">
-                <Box sx={{ minHeight: '150px' }}>
-                    {/* Step 0: Input Purpose */}
-                    {activeStep === 0 && (
-                        <div className="flex flex-col items-center">
-                            <CardTitle className="mb-6 text-2xl md:text-4xl">Purpose of Appointment</CardTitle>
-                            <div className="w-full max-w-lg">
-                                <Label htmlFor="purpose">Purpose</Label>
-                                <Tags
-                                    value={data.purposeTags.map((text) => ({ id: text, text }))}
-                                    onChange={(newTags: Tag[]) =>
-                                        setData(
-                                            'purposeTags',
-                                            newTags.map((t) => t.text),
-                                        )
-                                    }
-                                    ariaInvalid={!!errors.purposeTags}
-                                />
-                                <InputError message={errors.purposeTags} />
-                            </div>
-                            <div className="mt-10 grid grid-cols-1 gap-3 md:grid-cols-7">
-                                <div className="flex flex-wrap justify-center gap-3 md:col-span-7">
-                                    {['Rent', 'Gown', 'Suit', 'Make-Up', 'Catering', 'Inquire', 'Follow-ups'].map((purpose) => (
-                                        <Shadcn
-                                            key={purpose}
-                                            className="w-auto"
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() => {
-                                                // Check if the string already exists
-                                                if (!data.purposeTags.includes(purpose)) {
-                                                    setData('purposeTags', [...data.purposeTags, purpose]);
-                                                }
-                                            }}
-                                        >
-                                            {purpose}
-                                        </Shadcn>
-                                    ))}
-                                </div>
-
-                                <div className="flex flex-wrap justify-center gap-3 md:col-span-7">
-                                    {['Design Consultation', 'Venue Decoration', 'Church Decoration'].map((purpose) => (
-                                        <Shadcn
-                                            key={purpose}
-                                            className="w-auto"
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() => {
-                                                // Check if the string already exists
-                                                if (!data.purposeTags.includes(purpose)) {
-                                                    setData('purposeTags', [...data.purposeTags, purpose]);
-                                                }
-                                            }}
-                                        >
-                                            {purpose}
-                                        </Shadcn>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Step 1: Date & Time (unchanged) */}
-                    {activeStep === 1 && (
-                        <div className="flex flex-col items-center">
-                            <CardTitle className="mb-5 text-2xl md:text-4xl">Select Appointment Date & Time</CardTitle>
-                            <div
-                                className={
-                                    date
-                                        ? 'grid grid-cols-1 flex-wrap gap-3 transition-all duration-500 ease-in-out md:grid-cols-2'
-                                        : 'flex flex-wrap justify-center transition-all duration-500 ease-in-out'
-                                }
-                            >
-                                <div className={date ? '' : 'flex justify-center'}>
-                                    <Calendar
-                                        mode="single"
-                                        selected={date}
-                                        onSelect={setDate}
-                                        className="mt-3 h-115 w-full lg:w-100 rounded-lg border"
-                                        captionLayout="dropdown"
-                                        disabled={(day) => {
-                                            const today = new Date();
-                                            today.setHours(0, 0, 0, 0);
-                                            if (day < today) return true;
-
-                                            const dayKey = formatLocalDate(day);
-
-                                            const fullyBooked = appointmentSlots.every((slot) => {
-                                                // const booked = bookedTimes[dayKey]?.some(
-                                                //     (t) =>
-                                                //         (slot.from >= t.from && slot.from < t.to) ||
-                                                //         (slot.to > t.from && slot.to <= t.to) ||
-                                                //         (slot.from <= t.from && slot.to >= t.to),
-                                                // );
-
-                                                const appointment = appointmentTimes[dayKey]?.some(
-                                                    (t) =>
-                                                        (slot.from >= t.from && slot.from < t.to) ||
-                                                        (slot.to > t.from && slot.to <= t.to) ||
-                                                        (slot.from <= t.from && slot.to >= t.to),
-                                                );
-
-                                                return appointment;
-                                            });
-
-                                            return fullyBooked;
-                                        }}
+                <form id="appointmentForm" onSubmit={handleSubmit} className="pb-20">
+                    <Box sx={{ minHeight: '150px' }}>
+                        {/* Step 0: Input Purpose */}
+                        {activeStep === 0 && (
+                            <div className="flex flex-col items-center">
+                                <CardTitle className="mb-6 text-2xl md:text-4xl">Purpose of Appointment</CardTitle>
+                                <div className="w-full max-w-lg">
+                                    <Label htmlFor="purpose">Purpose</Label>
+                                    <Tags
+                                        value={data.purposeTags.map((text) => ({ id: text, text }))}
+                                        onChange={(newTags: Tag[]) =>
+                                            setData(
+                                                'purposeTags',
+                                                newTags.map((t) => t.text),
+                                            )
+                                        }
+                                        ariaInvalid={!!errors.purposeTags}
                                     />
+                                    <InputError message={errors.purposeTags} />
                                 </div>
-                                {date && (
-                                    <div className="mt-6 w-full max-w-lg transform transition-all duration-500">
-                                        <CardTitle className="mb-5 text-lg">Appointment Slots {date.toDateString()}</CardTitle>
+                                <div className="mt-10 grid grid-cols-1 gap-3 md:grid-cols-7">
+                                    <div className="flex flex-wrap justify-center gap-3 md:col-span-7">
+                                        {['Rent', 'Gown', 'Suit', 'Make-Up', 'Catering', 'Inquire', 'Follow-ups'].map((purpose) => (
+                                            <Shadcn
+                                                key={purpose}
+                                                className="w-auto"
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => {
+                                                    // Check if the string already exists
+                                                    if (!data.purposeTags.includes(purpose)) {
+                                                        setData('purposeTags', [...data.purposeTags, purpose]);
+                                                    }
+                                                }}
+                                            >
+                                                {purpose}
+                                            </Shadcn>
+                                        ))}
+                                    </div>
 
-                                        <div className="mt-2 grid grid-cols-1 gap-2">
-                                            {appointmentSlots.map((slot, idx) => {
-                                                const dateKey = formatLocalDate(date!);
-                                                // const isBooked =
-                                                //     bookedTimes[dateKey]?.some(
-                                                //         (t) =>
-                                                //             (slot.from >= t.from && slot.from < t.to) ||
-                                                //             (slot.to > t.from && slot.to <= t.to) ||
-                                                //             (slot.from <= t.from && slot.to >= t.to),
-                                                //     ) ?? false;
+                                    <div className="flex flex-wrap justify-center gap-3 md:col-span-7">
+                                        {['Design Consultation', 'Venue Decoration', 'Church Decoration'].map((purpose) => (
+                                            <Shadcn
+                                                key={purpose}
+                                                className="w-auto"
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => {
+                                                    // Check if the string already exists
+                                                    if (!data.purposeTags.includes(purpose)) {
+                                                        setData('purposeTags', [...data.purposeTags, purpose]);
+                                                    }
+                                                }}
+                                            >
+                                                {purpose}
+                                            </Shadcn>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
-                                                const isAppointment =
-                                                    appointmentTimes[dateKey]?.some(
+                        {/* Step 1: Date & Time (unchanged) */}
+                        {activeStep === 1 && (
+                            <div className="flex flex-col items-center">
+                                <CardTitle className="mb-5 text-2xl md:text-4xl">Select Appointment Date & Time</CardTitle>
+                                <div
+                                    className={
+                                        date
+                                            ? 'grid grid-cols-1 flex-wrap gap-3 transition-all duration-500 ease-in-out md:grid-cols-2'
+                                            : 'flex flex-wrap justify-center transition-all duration-500 ease-in-out'
+                                    }
+                                >
+                                    <div className={date ? '' : 'flex justify-center'}>
+                                        <Calendar
+                                            mode="single"
+                                            selected={date}
+                                            onSelect={setDate}
+                                            className="mt-3 h-100 w-80 rounded-lg border lg:h-105 lg:w-85"
+                                            captionLayout="dropdown"
+                                            disabled={(day) => {
+                                                const today = new Date();
+                                                today.setHours(0, 0, 0, 0);
+                                                if (day < today) return true;
+
+                                                const dayKey = formatLocalDate(day);
+
+                                                const fullyBooked = appointmentSlots.every((slot) => {
+                                                    // const booked = bookedTimes[dayKey]?.some(
+                                                    //     (t) =>
+                                                    //         (slot.from >= t.from && slot.from < t.to) ||
+                                                    //         (slot.to > t.from && slot.to <= t.to) ||
+                                                    //         (slot.from <= t.from && slot.to >= t.to),
+                                                    // );
+
+                                                    const appointment = appointmentTimes[dayKey]?.some(
                                                         (t) =>
                                                             (slot.from >= t.from && slot.from < t.to) ||
                                                             (slot.to > t.from && slot.to <= t.to) ||
                                                             (slot.from <= t.from && slot.to >= t.to),
-                                                    ) ?? false;
+                                                    );
 
-                                                return (
-                                                    <Shadcn
-                                                        key={idx}
-                                                        type="button"
-                                                        variant={isAppointment ? 'ghost' : selectedSlot === idx ? 'secondary' : 'outline'}
-                                                        className={`${isAppointment ? 'cursor-not-allowed text-gray-400 line-through' : 'cursor-pointer'}`}
-                                                        disabled={isAppointment}
-                                                        onClick={() => {
-                                                            if (!isAppointment) {
-                                                                setSelectedSlot(idx);
-                                                            }
-                                                        }}
-                                                    >
-                                                        {formatTo12Hour(slot.from)}
-                                                    </Shadcn>
-                                                );
-                                            })}
-                                        </div>
+                                                    return appointment;
+                                                });
+
+                                                return fullyBooked;
+                                            }}
+                                        />
                                     </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
+                                    {date && (
+                                        <div className="mt-6 w-full max-w-lg transform transition-all duration-500">
+                                            <CardTitle className="mb-5 text-lg">Appointment Slots {date.toDateString()}</CardTitle>
 
-                    {/* Step 2: Booking Info (unchanged) */}
-                    {activeStep === 2 && (
-                        <div className="mx-auto flex w-full max-w-3xl flex-col items-center">
-                            <CardTitle className="mb-6 text-2xl md:text-4xl">Fill out the Appointment Form</CardTitle>
-                            {/* Contact Information */}
-                            <div className="mb-6 w-full">
-                                <Label className="mb-2">Contact Information</Label>
-                                <Input
-                                    type="text"
-                                    placeholder="Full Name"
-                                    value={data.fullName || ''}
-                                    onChange={(e) => setData('fullName', e.target.value)}
-                                    aria-invalid={!!errors.fullName}
-                                    className="mb-3"
-                                />
-                                <InputError message={errors.fullName} />
-                                <Input
-                                    type="email"
-                                    placeholder="Email Address"
-                                    value={data.email || ''}
-                                    onChange={(e) => setData('email', e.target.value)}
-                                    aria-invalid={!!errors.email}
-                                    className="mb-3"
-                                />
-                                <InputError message={errors.email} />
-                                <Input
-                                    placeholder="Phone Number"
-                                    value={data.phone || ''}
-                                    onChange={(e) => setData('phone', e.target.value)}
-                                    aria-invalid={!!errors.phone}
-                                />
-                                <InputError message={errors.phone} />
-                            </div>
-                        </div>
-                    )}
+                                            <div className="mt-2 grid grid-cols-1 gap-2">
+                                                {appointmentSlots.map((slot, idx) => {
+                                                    const dateKey = formatLocalDate(date!);
+                                                    // const isBooked =
+                                                    //     bookedTimes[dateKey]?.some(
+                                                    //         (t) =>
+                                                    //             (slot.from >= t.from && slot.from < t.to) ||
+                                                    //             (slot.to > t.from && slot.to <= t.to) ||
+                                                    //             (slot.from <= t.from && slot.to >= t.to),
+                                                    //     ) ?? false;
 
-                    {/* Step 3: Review / Booking Summary (unchanged) */}
-                    {activeStep === 3 && (
-                        <div className="flex flex-col items-center justify-center px-6 py-10">
-                            {/* Title */}
-                            <CardTitle className="mb-8 text-center text-2xl md:text-4xl">Review Appointment</CardTitle>
+                                                    const isAppointment =
+                                                        appointmentTimes[dateKey]?.some(
+                                                            (t) =>
+                                                                (slot.from >= t.from && slot.from < t.to) ||
+                                                                (slot.to > t.from && slot.to <= t.to) ||
+                                                                (slot.from <= t.from && slot.to >= t.to),
+                                                        ) ?? false;
 
-                            <div className="w-full max-w-xl">
-                                {/* Section Header */}
-                                <h2 className="mb-4 text-xl font-semibold text-gray-700">Your Appointment</h2>
-
-                                {/* Appointment Details */}
-                                <div className="space-y-3 text-gray-700">
-                                    <p>
-                                        <span className="font-medium text-gray-800">Purpose:</span>{' '}
-                                        {data.purposeTags.length > 0 ? data.purposeTags.join(', ') : 'Not provided'}
-                                    </p>
-
-                                    <p>
-                                        <span className="font-medium text-gray-800">Date & Time:</span> {data.datetime || 'Not selected'}
-                                    </p>
-                                </div>
-
-                                {/* Contact Section */}
-                                <h3 className="mt-8 mb-3 text-lg font-semibold text-gray-700">Contact Information</h3>
-
-                                <div className="space-y-3 text-gray-700">
-                                    <p>
-                                        <span className="font-medium text-gray-800">Full Name:</span> {data.fullName || 'Not provided'}
-                                    </p>
-                                    <p>
-                                        <span className="font-medium text-gray-800">Email:</span> {data.email || 'Not provided'}
-                                    </p>
-                                    <p>
-                                        <span className="font-medium text-gray-800">Phone:</span> {data.phone || 'Not provided'}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </Box>
-
-                {/* Navigation Buttons */}
-                <MobileStepper
-                    variant="dots"
-                    steps={steps.length}
-                    position="bottom"
-                    activeStep={activeStep}
-                    nextButton={
-                        activeStep < steps.length - 1 ? (
-                            <Button
-                                type="button"
-                                onClick={() => {
-                                    if (validateStep(activeStep)) {
-                                        setActiveStep((prev) => prev + 1);
-                                    } else {
-                                        toast.error('Please complete all required fields before proceeding.');
-                                    }
-                                }}
-                            >
-                                Next
-                            </Button>
-                        ) : (
-                            <>
-                                {/* Only render Dialog for confirm or verify steps */}
-                                {(step === 'confirm' || step === 'verify') && (
-                                    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                                        <DialogTrigger asChild>
-                                            <Shadcn variant="default" type="button">
-                                                Submit Appointment
-                                            </Shadcn>
-                                        </DialogTrigger>
-
-                                        <DialogContent className="pointer-events-auto z-[1000]" style={{ overflow: 'visible' }}>
-                                            {step === 'confirm' && (
-                                                <>
-                                                    <DialogHeader>
-                                                        <DialogTitle>Are you sure?</DialogTitle>
-                                                        <DialogDescription>
-                                                            Please confirm your appointment details before proceeding.
-                                                        </DialogDescription>
-                                                    </DialogHeader>
-                                                    <DialogFooter>
-                                                        <DialogClose asChild>
-                                                            <Shadcn variant="secondary">No</Shadcn>
-                                                        </DialogClose>
-                                                        <Shadcn variant="default" type="button" onClick={() => setStep('recaptcha')}>
-                                                            Yes
+                                                    return (
+                                                        <Shadcn
+                                                            key={idx}
+                                                            type="button"
+                                                            variant={isAppointment ? 'ghost' : selectedSlot === idx ? 'brand2' : 'outline'}
+                                                            className={`${isAppointment ? 'cursor-not-allowed text-gray-400 line-through' : 'cursor-pointer'}`}
+                                                            disabled={isAppointment}
+                                                            onClick={() => {
+                                                                if (!isAppointment) {
+                                                                    setSelectedSlot(idx);
+                                                                }
+                                                            }}
+                                                        >
+                                                            {formatTo12Hour(slot.from)}
                                                         </Shadcn>
-                                                    </DialogFooter>
-                                                </>
-                                            )}
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
 
-                                            {step === 'verify' && (
-                                                <div className="relative flex flex-col items-center text-center">
-                                                    {/* ✅ Floating Check Icon */}
-                                                    <motion.div
-                                                        initial={{ scale: 0, opacity: 0 }}
-                                                        animate={{ scale: 1, opacity: 1 }}
-                                                        transition={{
-                                                            type: 'spring',
-                                                            stiffness: 400,
-                                                            damping: 20,
-                                                            duration: 0.5,
-                                                        }}
-                                                        className="absolute -top-16 left-1/2 z-10 -translate-x-1/2 rounded-full"
-                                                    >
-                                                        <img
-                                                            src={`/storage/Home Page (1) 1.png`}
-                                                            alt="Appointment Verified"
-                                                            className="h-24 w-24 object-contain"
-                                                        />
-                                                    </motion.div>
+                        {/* Step 2: Booking Info (unchanged) */}
+                        {activeStep === 2 && (
+                            <div className="mx-auto flex w-full max-w-3xl flex-col items-center">
+                                <CardTitle className="mb-6 text-2xl md:text-4xl">Fill out the Appointment Form</CardTitle>
+                                {/* Contact Information */}
+                                <div className="mb-6 w-full">
+                                    <Label className="mb-2">Contact Information</Label>
+                                    <Input
+                                        type="text"
+                                        placeholder="Enter Full Name"
+                                        value={data.fullName || ''}
+                                        onChange={(e) => setData('fullName', e.target.value)}
+                                        aria-invalid={!!errors.fullName}
+                                        className="mb-3"
+                                    />
+                                    <InputError message={errors.fullName} />
+                                    <Label className="mb-2">Email Address</Label>
+                                    <Input
+                                        type="email"
+                                        placeholder="Enter Email Address"
+                                        value={data.email || ''}
+                                        onChange={(e) => setData('email', e.target.value)}
+                                        aria-invalid={!!errors.email}
+                                        className="mb-3"
+                                    />
+                                    <InputError message={errors.email} />
+                                    <Label className="mb-2">Phone Number</Label>
+                                    <Input
+                                        placeholder="Enter Phone Number"
+                                        value={data.phone || ''}
+                                        onChange={(e) => setData('phone', e.target.value)}
+                                        aria-invalid={!!errors.phone}
+                                    />
+                                    <InputError message={errors.phone} />
+                                </div>
+                            </div>
+                        )}
 
-                                                    {/* Dialog Content */}
-                                                    <div className="mt-20 w-full max-w-md px-4">
-                                                        <DialogHeader className="flex flex-col items-center justify-center gap-4 text-center">
-                                                            <DialogTitle className="text-2xl font-semibold text-emerald-500">
-                                                                Appointment Submitted!
-                                                            </DialogTitle>
-                                                            <motion.div
-                                                                initial={{ y: 20, opacity: 0 }}
-                                                                animate={{ y: 0, opacity: 1 }}
-                                                                transition={{
-                                                                    delay: 0.3,
-                                                                    duration: 0.8,
-                                                                    ease: 'easeOut',
-                                                                }}
-                                                                className="mt-4 flex justify-center"
-                                                            >
-                                                                <img
-                                                                    src={`/storage/Home Page (2) 1.png`}
-                                                                    alt="Email Sent"
-                                                                    className="h-24 w-40 object-contain"
-                                                                />
-                                                            </motion.div>
-                                                            <DialogDescription className="leading-relaxed text-gray-600">
-                                                                Your appointment request has been submitted successfully. Please be on time for your scheduled date.
+                        {/* Step 3: Review / Booking Summary (unchanged) */}
+                        {activeStep === 3 && (
+                            <div className="flex flex-col items-center justify-center px-6 py-10">
+                                {/* Title */}
+                                <CardTitle className="mb-8 text-center text-2xl md:text-4xl">Review Appointment</CardTitle>
+
+                                <div className="w-full max-w-xl">
+                                    {/* Section Header */}
+                                    <h2 className="mb-4 text-xl font-semibold text-gray-700">Your Appointment</h2>
+
+                                    {/* Appointment Details */}
+                                    <div className="space-y-3 text-gray-700">
+                                        <p>
+                                            <span className="font-medium text-gray-800">Purpose:</span>{' '}
+                                            {data.purposeTags.length > 0 ? data.purposeTags.join(', ') : 'Not provided'}
+                                        </p>
+
+                                        <p>
+                                            <span className="font-medium text-gray-800">Date & Time:</span> {data.datetime || 'Not selected'}
+                                        </p>
+                                    </div>
+
+                                    {/* Contact Section */}
+                                    <h3 className="mt-8 mb-3 text-lg font-semibold text-gray-700">Contact Information</h3>
+
+                                    <div className="space-y-3 text-gray-700">
+                                        <p>
+                                            <span className="font-medium text-gray-800">Full Name:</span> {data.fullName || 'Not provided'}
+                                        </p>
+                                        <p>
+                                            <span className="font-medium text-gray-800">Email:</span> {data.email || 'Not provided'}
+                                        </p>
+                                        <p>
+                                            <span className="font-medium text-gray-800">Phone:</span> {data.phone || 'Not provided'}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </Box>
+
+                    {/* Navigation Buttons */}
+                    <MobileStepper
+                        variant="dots"
+                        steps={steps.length}
+                        position="bottom"
+                        activeStep={activeStep}
+                        nextButton={
+                            activeStep < steps.length - 1 ? (
+                                <Button
+                                    type="button"
+                                    onClick={() => {
+                                        if (validateStep(activeStep)) {
+                                            setActiveStep((prev) => prev + 1);
+                                        } else {
+                                            if (activeStep === 2) {
+                                                if (!data.fullName) {
+                                                    toast.error('Full name is required.');
+                                                } else if (!data.email) {
+                                                    toast.error('Email address is required.');
+                                                } else if (!validateEmail(data.email)) {
+                                                    toast.error('Please enter a valid email address.');
+                                                } else if (!data.phone) {
+                                                    toast.error('Phone number is required.');
+                                                } else if (!validatePhone(data.phone)) {
+                                                    toast.error('Please enter a valid phone number (11 digits starting with 09).');
+                                                }
+                                            } else {
+                                                toast.error('Please complete all required fields before proceeding.');
+                                            }
+                                        }
+                                    }}
+                                >
+                                    Next
+                                </Button>
+                            ) : (
+                                <>
+                                    {/* Only render Dialog for confirm or verify steps */}
+                                    {(step === 'confirm' || step === 'verify') && (
+                                        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                                            <DialogTrigger asChild>
+                                                <Shadcn variant="default" type="button">
+                                                    Submit Appointment
+                                                </Shadcn>
+                                            </DialogTrigger>
+
+                                            <DialogContent className="pointer-events-auto z-[1000]" style={{ overflow: 'visible' }}>
+                                                {step === 'confirm' && (
+                                                    <>
+                                                        <DialogHeader>
+                                                            <DialogTitle>Are you sure?</DialogTitle>
+                                                            <DialogDescription>
+                                                                Please confirm your appointment details before proceeding.
                                                             </DialogDescription>
                                                         </DialogHeader>
-
                                                         <DialogFooter>
-                                                            <div className="mt-6 w-full justify-center">
-                                                                <TextLink href={route('home.index')} className="text-sm">
-                                                                    Proceed to Home
-                                                                </TextLink>
-                                                            </div>
+                                                            <DialogClose asChild>
+                                                                <Shadcn variant="secondary">No</Shadcn>
+                                                            </DialogClose>
+                                                            <Shadcn variant="default" type="button" onClick={() => setStep('recaptcha')}>
+                                                                Yes
+                                                            </Shadcn>
                                                         </DialogFooter>
+                                                    </>
+                                                )}
+
+                                                {step === 'verify' && (
+                                                    <div className="relative flex flex-col items-center text-center">
+                                                        {/* ✅ Floating Check Icon */}
+                                                        <motion.div
+                                                            initial={{ scale: 0, opacity: 0 }}
+                                                            animate={{ scale: 1, opacity: 1 }}
+                                                            transition={{
+                                                                type: 'spring',
+                                                                stiffness: 400,
+                                                                damping: 20,
+                                                                duration: 0.5,
+                                                            }}
+                                                            className="absolute -top-16 left-1/2 z-10 -translate-x-1/2 rounded-full"
+                                                        >
+                                                            <img
+                                                                src={`/storage/Home Page (1) 1.png`}
+                                                                alt="Appointment Verified"
+                                                                className="h-24 w-24 object-contain"
+                                                            />
+                                                        </motion.div>
+
+                                                        {/* Dialog Content */}
+                                                        <div className="mt-20 w-full max-w-md px-4">
+                                                            <DialogHeader className="flex flex-col items-center justify-center gap-4 text-center">
+                                                                <DialogTitle className="text-2xl font-semibold text-emerald-500">
+                                                                    Appointment Submitted!
+                                                                </DialogTitle>
+                                                                <motion.div
+                                                                    initial={{ y: 20, opacity: 0 }}
+                                                                    animate={{ y: 0, opacity: 1 }}
+                                                                    transition={{
+                                                                        delay: 0.3,
+                                                                        duration: 0.8,
+                                                                        ease: 'easeOut',
+                                                                    }}
+                                                                    className="mt-4 flex justify-center"
+                                                                >
+                                                                    <img
+                                                                        src={`/storage/Home Page (2) 1.png`}
+                                                                        alt="Email Sent"
+                                                                        className="h-24 w-40 object-contain"
+                                                                    />
+                                                                </motion.div>
+                                                                <DialogDescription className="leading-relaxed text-gray-600">
+                                                                    Your appointment request has been submitted successfully. Please be on time for
+                                                                    your scheduled date.
+                                                                </DialogDescription>
+                                                            </DialogHeader>
+
+                                                            <DialogFooter>
+                                                                <div className="mt-6 w-full justify-center">
+                                                                    <TextLink href={route('home.index')} className="text-sm">
+                                                                        Proceed to Home
+                                                                    </TextLink>
+                                                                </div>
+                                                            </DialogFooter>
+                                                        </div>
                                                     </div>
+                                                )}
+                                            </DialogContent>
+                                        </Dialog>
+                                    )}
+
+                                    {/* ReCAPTCHA modal */}
+                                    {step === 'recaptcha' && (
+                                        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50">
+                                            <div className="relative w-[400px] rounded-lg bg-white p-6 shadow-lg">
+                                                <div className="mb-4 flex flex-col items-center gap-3 text-center">
+                                                    <h3 className="text-lg font-semibold">Verify You're Human</h3>
+                                                    <p>Please complete the reCAPTCHA to submit your appointment.</p>
                                                 </div>
-                                            )}
-                                        </DialogContent>
-                                    </Dialog>
-                                )}
 
-                                {/* ReCAPTCHA modal */}
-                                {step === 'recaptcha' && (
-                                    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50">
-                                        <div className="relative w-[400px] rounded-lg bg-white p-6 shadow-lg">
-                                            <div className="mb-4 flex flex-col items-center gap-3 text-center">
-                                                <h3 className="text-lg font-semibold">Verify You're Human</h3>
-                                                <p>Please complete the reCAPTCHA to submit your appointment.</p>
-                                            </div>
+                                                <ReCAPTCHA
+                                                    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                                                    onChange={(token: string | null) => setCaptchaToken(token)}
+                                                />
 
-                                            <ReCAPTCHA
-                                                sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-                                                onChange={(token: string | null) => setCaptchaToken(token)}
-                                            />
-
-                                            <div className="mt-4 flex justify-end gap-2">
-                                                <Shadcn variant="secondary" onClick={() => setStep('confirm')}>
-                                                    Cancel
-                                                </Shadcn>
-                                                <Shadcn
-                                                    variant="default"
-                                                    onClick={() => {
-                                                        if (!captchaToken) {
-                                                            toast.error('Please complete the reCAPTCHA.');
-                                                            return;
-                                                        }
-                                                        setData((prev) => ({
-                                                            ...prev,
-                                                            captcha_token: captchaToken,
-                                                        }));
-                                                        post(route('appointments.store'), {
-                                                            onSuccess: () => setStep('verify'),
-                                                        });
-                                                    }}
-                                                    disabled={processing}
-                                                >
-                                                    Submit
-                                                </Shadcn>
+                                                <div className="mt-4 flex justify-end gap-2">
+                                                    <Shadcn variant="secondary" onClick={() => setStep('confirm')}>
+                                                        Cancel
+                                                    </Shadcn>
+                                                    <Shadcn
+                                                        variant="default"
+                                                        onClick={() => {
+                                                            if (!captchaToken) {
+                                                                toast.error('Please complete the reCAPTCHA.');
+                                                                return;
+                                                            }
+                                                            setData((prev) => ({
+                                                                ...prev,
+                                                                captcha_token: captchaToken,
+                                                            }));
+                                                            post(route('appointments.store'), {
+                                                                onSuccess: () => setStep('verify'),
+                                                            });
+                                                        }}
+                                                        disabled={processing}
+                                                    >
+                                                        Submit
+                                                    </Shadcn>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                )}
-                            </>
-                        )
-                    }
-                    backButton={
-                        <Button onClick={() => setActiveStep((prev) => prev - 1)} disabled={activeStep === 0}>
-                            Back
-                        </Button>
-                    }
-                    sx={{ mt: 3 }}
-                />
-            </form>
-        </Box>
+                                    )}
+                                </>
+                            )
+                        }
+                        backButton={
+                            <Button onClick={() => setActiveStep((prev) => prev - 1)} disabled={activeStep === 0}>
+                                Back
+                            </Button>
+                        }
+                        sx={{ mt: 3 }}
+                    />
+                </form>
+            </Box>
         </>
     );
 }

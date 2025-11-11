@@ -29,19 +29,19 @@ const HeroSection: React.FC<HeroSectionProps & { packages: any[] }> = ({ package
     return (
         <>
             {showNews && <News promo={promo} />}
-            <div id="hero" className="relative min-h-screen overflow-hidden bg-white">
+            <div id="hero" className="relative min-h-screen overflow-hidden bg-white lg:mb-24">
                 {/* Navigation */}
                 <Navbar packages={packages} />
 
                 {/* Main Content */}
                 {/* Hero Section */}
-                <div className="relative flex min-h-screen items-center">
-                    <div className="mx-auto w-full max-w-7xl px-6 py-40 sm:px-6 lg:px-8">
+                <div className="relative flex min-h-screen items-center pt-16 lg:pt-0">
+                    <div className="mx-auto w-full max-w-7xl px-6 py-20 sm:px-6 lg:px-8 lg:py-40">
                         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
                             {/*Text Content */}
                             <div className="z-10 text-center">
                                 <h3 className="heading-3 font-heading text-black">Turning Your Dream Celebrations Into Elegant Realities</h3>
-                                <p className="body-medium m-10 font-body leading-relaxed text-gray-800">
+                                <p className="body-medium m-4 font-body leading-relaxed text-gray-800 lg:m-10">
                                     Elevated Event Experiences with Custom Elegance — From Custom Gowns to Fine Cuisine, for Life's Most Cherished
                                     Celebrations.
                                 </p>

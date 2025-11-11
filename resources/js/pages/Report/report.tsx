@@ -208,15 +208,15 @@ export default function Report({
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <CardTitle>Report</CardTitle>
                 <CardDescription className="mb-2">You can manage bookings and appointments reports here.</CardDescription>
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="relative w-full sm:w-1/4">
                         <Input id="search" className="peer ps-9" placeholder="Search Reports" type="search" onChange={onSearchChange} />
                         <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3 text-muted-foreground/80">
                             <Search size={16} aria-hidden="true" />
                         </div>
                     </div>
-                    <div className="flex gap-2">
-                        <div className="flex justify-end gap-2">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
+                        <div className="flex flex-wrap gap-2">
                             {filters.date && (
                                 <Badge variant="secondary" className="flex items-center gap-1">
                                     Date: {filters.date}
@@ -349,6 +349,7 @@ export default function Report({
                             </div>
                         </div>
                         <Button
+                            className="w-full sm:w-auto"
                             onClick={() => {
                                 if (activeTab === 'bookings') {
                                     printBookings(booking);
@@ -381,143 +382,149 @@ export default function Report({
                     </div>
                     {/* ... (Rest of the JSX for tabs and tables remains unchanged) */}
                     <TabsContent value="bookings">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[50px]">
-                                        <Checkbox
-                                            checked={isAllBookingsSelected || isIndeterminateBookings}
-                                            onCheckedChange={toggleAllBookings}
-                                            aria-label="Select all bookings"
-                                        />
-                                    </TableHead>
-                                    <TableHead>Transaction Number</TableHead>
-                                    <TableHead>Event Name</TableHead>
-                                    <TableHead>Event Date</TableHead>
-                                    <TableHead>Event Type</TableHead>
-                                    <TableHead>Contact Name</TableHead>
-                                    <TableHead>Action</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {booking.length > 0 ? (
-                                    booking.map((b) => (
-                                        <TableRow key={b.booking_id}>
-                                            <TableCell className="w-[50px]">
-                                                <Checkbox
-                                                    checked={selectedBookingIds.has(b.booking_id)}
-                                                    onCheckedChange={(checked) => toggleBookingSelection(b.booking_id, checked === true)}
-                                                    aria-label={`Select booking ${b.event_name}`}
-                                                />
-                                            </TableCell>
-                                            <TableCell>{b.transaction_number}</TableCell>
-                                            <TableCell>{b.event_name}</TableCell>
-                                            <TableCell>{b.event_date}</TableCell>
-                                            <TableCell>{b.event_type}</TableCell>
-                                            <TableCell>{b.contact_name}</TableCell>
-                                            <TableCell className="flex items-center justify-center space-x-3">
-                                                <Button
-                                                    variant="link"
-                                                    className="cursor-pointer underline hover:text-accent2 hover:underline"
-                                                    onClick={() => openReportPdf(b.booking_id)}
-                                                >
-                                                    <Download />
-                                                </Button>
-                                                <Trash2
-                                                    className="cursor-pointer text-red-600 hover:text-gray-800"
-                                                    size={18}
-                                                    onClick={() => confirmDeleteBooking(b.booking_id)}
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[50px]">
+                                            <Checkbox
+                                                checked={isAllBookingsSelected || isIndeterminateBookings}
+                                                onCheckedChange={toggleAllBookings}
+                                                aria-label="Select all bookings"
+                                            />
+                                        </TableHead>
+                                        <TableHead>Transaction Number</TableHead>
+                                        <TableHead>Event Name</TableHead>
+                                        <TableHead>Event Date</TableHead>
+                                        <TableHead className="hidden sm:table-cell">Event Type</TableHead>
+                                        <TableHead className="hidden sm:table-cell">Contact Name</TableHead>
+                                        <TableHead>Action</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {booking.length > 0 ? (
+                                        booking.map((b) => (
+                                            <TableRow key={b.booking_id}>
+                                                <TableCell className="w-[50px]">
+                                                    <Checkbox
+                                                        checked={selectedBookingIds.has(b.booking_id)}
+                                                        onCheckedChange={(checked) => toggleBookingSelection(b.booking_id, checked === true)}
+                                                        aria-label={`Select booking ${b.event_name}`}
+                                                    />
+                                                </TableCell>
+                                                <TableCell>{b.transaction_number}</TableCell>
+                                                <TableCell>{b.event_name}</TableCell>
+                                                <TableCell>{b.event_date}</TableCell>
+                                                <TableCell className="hidden sm:table-cell">{b.event_type}</TableCell>
+                                                <TableCell className="hidden sm:table-cell">{b.contact_name}</TableCell>
+                                                <TableCell className="flex items-center justify-center space-x-3">
+                                                    <Button
+                                                        variant="link"
+                                                        className="cursor-pointer underline hover:text-accent2 hover:underline"
+                                                        onClick={() => openReportPdf(b.booking_id)}
+                                                    >
+                                                        <Download />
+                                                    </Button>
+                                                    <Trash2
+                                                        className="cursor-pointer text-red-600 hover:text-gray-800"
+                                                        size={18}
+                                                        onClick={() => confirmDeleteBooking(b.booking_id)}
+                                                    />
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="text-center">
+                                                <EmptyEventBookings
+                                                    title="No events found"
+                                                    action={
+                                                        <Button className="gap-2" onClick={() => router.visit(route('adminbooking.index'))}>
+                                                            <Send className="size-4" />
+                                                            <span>Go to Module</span>
+                                                        </Button>
+                                                    }
                                                 />
                                             </TableCell>
                                         </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={7} className="text-center">
-                                            <EmptyEventBookings
-                                                title="No events found"
-                                                action={
-                                                    <Button className="gap-2" onClick={() => router.visit(route('adminbooking.index'))}>
-                                                        <Send className="size-4" />
-                                                        <span>Go to Module</span>
-                                                    </Button>
-                                                }
-                                            />
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
                     </TabsContent>
                     <TabsContent value="appointments">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[50px]">
-                                        <Checkbox
-                                            checked={isAllAppointmentsSelected || isIndeterminateAppointments}
-                                            onCheckedChange={toggleAllAppointments}
-                                            aria-label="Select all appointments"
-                                        />
-                                    </TableHead>
-                                    <TableHead>Contact Name</TableHead>
-                                    <TableHead>Contact Email</TableHead>
-                                    <TableHead>Contact Phone</TableHead>
-                                    <TableHead>Purpose</TableHead>
-                                    <TableHead>Appointment Date</TableHead>
-                                    <TableHead>Action</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {appointment.length > 0 ? (
-                                    appointment.map((a) => (
-                                        <TableRow key={a.appointment_id}>
-                                            <TableCell className="w-[50px]">
-                                                <Checkbox
-                                                    checked={selectedAppointmentIds.has(a.appointment_id)}
-                                                    onCheckedChange={(checked) => toggleAppointmentSelection(a.appointment_id, checked === true)}
-                                                    aria-label={`Select appointment ${a.purpose}`}
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[50px]">
+                                            <Checkbox
+                                                checked={isAllAppointmentsSelected || isIndeterminateAppointments}
+                                                onCheckedChange={toggleAllAppointments}
+                                                aria-label="Select all appointments"
+                                            />
+                                        </TableHead>
+                                        <TableHead>Contact Name</TableHead>
+                                        <TableHead className="hidden sm:table-cell">Contact Email</TableHead>
+                                        <TableHead className="hidden sm:table-cell">Contact Phone</TableHead>
+                                        <TableHead>Purpose</TableHead>
+                                        <TableHead>Appointment Date</TableHead>
+                                        <TableHead>Action</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {appointment.length > 0 ? (
+                                        appointment.map((a) => (
+                                            <TableRow key={a.appointment_id}>
+                                                <TableCell className="w-[50px]">
+                                                    <Checkbox
+                                                        checked={selectedAppointmentIds.has(a.appointment_id)}
+                                                        onCheckedChange={(checked) => toggleAppointmentSelection(a.appointment_id, checked === true)}
+                                                        aria-label={`Select appointment ${a.purpose}`}
+                                                    />
+                                                </TableCell>
+                                                <TableCell>{a.contact_name}</TableCell>
+                                                <TableCell className="hidden sm:table-cell">{a.contact_email}</TableCell>
+                                                <TableCell className="hidden sm:table-cell">{a.contact_phone}</TableCell>
+                                                <TableCell>{a.purpose}</TableCell>
+                                                <TableCell>{a.appointment_date}</TableCell>
+                                                <TableCell className="flex justify-center space-x-3">
+                                                    <Tooltip>
+                                                        <TooltipTrigger>
+                                                            <Trash2
+                                                                className="cursor-pointer text-red-600 hover:text-gray-800"
+                                                                size={18}
+                                                                onClick={() => confirmDeleteAppointment(a.appointment_id)}
+                                                            />
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>Delete Appointment</TooltipContent>
+                                                    </Tooltip>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={6} className="text-center">
+                                                <EmptyEventBookings
+                                                    title="No appointments found"
+                                                    action={
+                                                        <Button className="gap-2" onClick={() => router.visit(route('adminappointments.index'))}>
+                                                            <Send className="size-4" />
+                                                            <span>Go to Module</span>
+                                                        </Button>
+                                                    }
                                                 />
                                             </TableCell>
-                                            <TableCell>{a.contact_name}</TableCell>
-                                            <TableCell>{a.contact_email}</TableCell>
-                                            <TableCell>{a.contact_phone}</TableCell>
-                                            <TableCell>{a.purpose}</TableCell>
-                                            <TableCell>{a.appointment_date}</TableCell>
-                                            <TableCell className="flex justify-center space-x-3">
-                                                <Tooltip>
-                                                    <TooltipTrigger>
-                                                        <Trash2
-                                                            className="cursor-pointer text-red-600 hover:text-gray-800"
-                                                            size={18}
-                                                            onClick={() => confirmDeleteAppointment(a.appointment_id)}
-                                                        />
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>Delete Appointment</TooltipContent>
-                                                </Tooltip>
-                                            </TableCell>
                                         </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={8} className="text-center">
-                                            <EmptyEventBookings
-                                                title="No appointments found"
-                                                action={
-                                                    <Button className="gap-2" onClick={() => router.visit(route('adminappointments.index'))}>
-                                                        <Send className="size-4" />
-                                                        <span>Go to Module</span>
-                                                    </Button>
-                                                }
-                                            />{' '}
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
                     </TabsContent>
                     <TabsContent value="service-bookings">
-                        <ServiceBookingTable service_booking={service_booking} />
+                        <div className="overflow-x-auto">
+                            <ServiceBookingTable service_booking={service_booking} />
+                        </div>
                     </TabsContent>
                 </Tabs>
             </div>

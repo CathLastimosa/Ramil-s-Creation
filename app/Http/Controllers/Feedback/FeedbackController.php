@@ -33,7 +33,7 @@ class FeedbackController extends Controller
             'rating_emote' => $feedback['rating'],
             'feedback' => $feedback['feedback'],
         ]);
-        return redirect('/home')->with('success', [
+        return redirect('/')->with('success', [
             'message' => 'Thank you for your feedback!',
             'feedback' => [
                 'statements' => [

@@ -209,11 +209,11 @@ export default function CalendarPage() {
                                                             return (
                                                                 <Button
                                                                     key={idx}
-                                                                    variant={unavailable ? 'ghost' : 'outline'}
+                                                                    variant={unavailable ? 'ghost' : 'ghost'}
                                                                     className={`p-2 text-sm ${
                                                                         unavailable
                                                                             ? 'cursor-not-allowed text-gray-400 line-through'
-                                                                            : 'text-gray-800'
+                                                                            : 'text-accent2'
                                                                     }`}
                                                                     disabled
                                                                 >

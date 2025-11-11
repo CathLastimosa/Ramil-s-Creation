@@ -15,7 +15,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import debounce from 'lodash/debounce';
-import { Ban, CheckCircle, Eye, LucidePlus, Mail, Pencil, Phone, Plus, Search, Send, Trash2, UserPlus } from 'lucide-react';
+import { Ban, CheckCircle, Eye, LucidePlus, Mail, Pencil, Phone, Plus, Search, Trash2, UserPlus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -199,7 +199,7 @@ export default function Staff({ staff }: { staff: StaffType[] }) {
                 <CardTitle>Staff</CardTitle>
                 <CardDescription className="mb-2">You can manage staff here.</CardDescription>
 
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="relative w-full sm:w-1/3">
                         <Input id="search" className="peer ps-9" placeholder="Search Staff" type="search" onChange={onSearchChange} />
                         <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3 text-muted-foreground/80">
@@ -209,7 +209,7 @@ export default function Staff({ staff }: { staff: StaffType[] }) {
 
                     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                         <SheetTrigger asChild>
-                            <Button>
+                            <Button className="w-full sm:w-auto">
                                 <Plus className="h-4 w-4" />
                                 Add Staff
                             </Button>
@@ -439,107 +439,109 @@ export default function Staff({ staff }: { staff: StaffType[] }) {
                 </div>
 
                 {/* Staff Table */}
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Staff Name</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Contact Number</TableHead>
-                            <TableHead>Role</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Action</TableHead>
-                        </TableRow>
-                    </TableHeader>
+                <div className="overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Staff Name</TableHead>
+                                <TableHead className="hidden sm:table-cell">Email</TableHead>
+                                <TableHead className="hidden sm:table-cell">Contact Number</TableHead>
+                                <TableHead>Role</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Action</TableHead>
+                            </TableRow>
+                        </TableHeader>
 
-                    <TableBody>
-                        {staff.length > 0 ? (
-                            staff.map((member) => (
-                                <TableRow key={member.staff_id}>
-                                    <TableCell className="flex items-center gap-3">
-                                        <Avatar className="h-8 w-8">
-                                            <AvatarFallback className="font-medium text-white" style={{ backgroundColor: member.color }}>
-                                                {member.staff_name.charAt(0).toUpperCase()}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <span>{member.staff_name}</span>
-                                    </TableCell>
-                                    <TableCell>{member.email}</TableCell>
-                                    <TableCell>{member.contact_no}</TableCell>
-                                    <TableCell>
-                                        <Badge variant="outline" className="gap-1.5">
-                                            {member.role}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Badge
-                                            variant="outline"
-                                            className={`gap-1.5 border-0 px-2.5 py-1 text-xs font-medium capitalize ${
-                                                member.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                                            }`}
-                                        >
-                                            <span
-                                                className={`size-1.5 rounded-full ${member.status === 'active' ? 'bg-green-500' : 'bg-red-500'}`}
-                                                aria-hidden="true"
-                                            ></span>
-                                            {member.status.charAt(0).toUpperCase() + member.status.slice(1)}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="flex space-x-3">
-                                        <Tooltip>
-                                            <TooltipTrigger>
-                                                <Eye
-                                                    size={20}
-                                                    className="cursor-pointer text-green-600 hover:text-gray-800"
-                                                    onClick={() => {
-                                                        setSelectedStaff(member);
-                                                        setIsDialogOpen(true);
-                                                    }}
-                                                />
-                                            </TooltipTrigger>
-                                            <TooltipContent>View Staff</TooltipContent>
-                                        </Tooltip>
+                        <TableBody>
+                            {staff.length > 0 ? (
+                                staff.map((member) => (
+                                    <TableRow key={member.staff_id}>
+                                        <TableCell className="flex items-center gap-3">
+                                            <Avatar className="h-8 w-8">
+                                                <AvatarFallback className="font-medium text-white" style={{ backgroundColor: member.color }}>
+                                                    {member.staff_name.charAt(0).toUpperCase()}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <span>{member.staff_name}</span>
+                                        </TableCell>
+                                        <TableCell className="hidden sm:table-cell">{member.email}</TableCell>
+                                        <TableCell className="hidden sm:table-cell">{member.contact_no}</TableCell>
+                                        <TableCell>
+                                            <Badge variant="outline" className="gap-1.5">
+                                                {member.role}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge
+                                                variant="outline"
+                                                className={`gap-1.5 border-0 px-2.5 py-1 text-xs font-medium capitalize ${
+                                                    member.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                                                }`}
+                                            >
+                                                <span
+                                                    className={`size-1.5 rounded-full ${member.status === 'active' ? 'bg-green-500' : 'bg-red-500'}`}
+                                                    aria-hidden="true"
+                                                ></span>
+                                                {member.status.charAt(0).toUpperCase() + member.status.slice(1)}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="flex space-x-3">
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <Eye
+                                                        size={20}
+                                                        className="cursor-pointer text-green-600 hover:text-gray-800"
+                                                        onClick={() => {
+                                                            setSelectedStaff(member);
+                                                            setIsDialogOpen(true);
+                                                        }}
+                                                    />
+                                                </TooltipTrigger>
+                                                <TooltipContent>View Staff</TooltipContent>
+                                            </Tooltip>
 
-                                        <Tooltip>
-                                            <TooltipTrigger>
-                                                <Pencil
-                                                    onClick={() => router.visit(route('staff.edit', member.staff_id))}
-                                                    className="cursor-pointer text-yellow-600 hover:text-gray-800"
-                                                    size={20}
-                                                />
-                                            </TooltipTrigger>
-                                            <TooltipContent>Edit Staff</TooltipContent>
-                                        </Tooltip>
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <Pencil
+                                                        onClick={() => router.visit(route('staff.edit', member.staff_id))}
+                                                        className="cursor-pointer text-yellow-600 hover:text-gray-800"
+                                                        size={20}
+                                                    />
+                                                </TooltipTrigger>
+                                                <TooltipContent>Edit Staff</TooltipContent>
+                                            </Tooltip>
 
-                                        <Tooltip>
-                                            <TooltipTrigger>
-                                                <Trash2
-                                                    onClick={() => confirmDelete(member.staff_id)}
-                                                    className="cursor-pointer text-red-600 hover:text-gray-800"
-                                                    size={20}
-                                                />
-                                            </TooltipTrigger>
-                                            <TooltipContent>Delete Staff</TooltipContent>
-                                        </Tooltip>
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <Trash2
+                                                        onClick={() => confirmDelete(member.staff_id)}
+                                                        className="cursor-pointer text-red-600 hover:text-gray-800"
+                                                        size={20}
+                                                    />
+                                                </TooltipTrigger>
+                                                <TooltipContent>Delete Staff</TooltipContent>
+                                            </Tooltip>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={4} className="py-6 text-center">
+                                        <EmptyEventBookings
+                                            title="No staff found"
+                                            action={
+                                                <Button className="gap-2" onClick={() => setIsSheetOpen(true)}>
+                                                    <LucidePlus className="size-4" />
+                                                    <span>Add New Staff</span>
+                                                </Button>
+                                            }
+                                        />
                                     </TableCell>
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={6} className="py-6 text-center">
-                                    <EmptyEventBookings
-                                        title="No staff found"
-                                        action={
-                                            <Button className="gap-2" onClick={() => setIsSheetOpen(true)}>
-                                                <LucidePlus className="size-4" />
-                                                <span>Add New Staff</span>
-                                            </Button>
-                                        }
-                                    />
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
 
                 {/* View Staff Dialog */}
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

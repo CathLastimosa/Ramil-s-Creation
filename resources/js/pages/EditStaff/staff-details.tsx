@@ -135,7 +135,6 @@ export default function EditStaffDetails({ staff }: Props) {
                             Cancel
                         </Button>
                         <Button type="submit" disabled={processing} className="flex items-center gap-2">
-                            <Save size={16} />
                             {processing ? 'Saving...' : 'Save Changes'}
                         </Button>
                     </div>

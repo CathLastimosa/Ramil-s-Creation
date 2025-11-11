@@ -152,7 +152,7 @@ export default function EditAppointment({
                                         mode="single"
                                         selected={date}
                                         onSelect={setDate}
-                                        className="rounded-lg border shadow-sm"
+                                        className="mt-3 h-100 w-80 rounded-lg border lg:h-95 lg:w-75"
                                         captionLayout="dropdown"
                                         disabled={(day) => {
                                             const today = new Date();
@@ -209,10 +209,10 @@ export default function EditAppointment({
                                                     <Button
                                                         key={currentIdx}
                                                         type="button"
-                                                        variant={disabled ? 'ghost' : selectedSlot === currentIdx ? 'secondary' : 'outline'}
+                                                        variant={disabled ? 'ghost' : selectedSlot === currentIdx ? 'brand2' : 'outline'}
                                                         className={`p-2 text-sm ${
                                                             disabled ? 'cursor-not-allowed text-gray-400 line-through' : ''
-                                                        } ${selectedSlot === currentIdx && !disabled ? 'text-brand-primary' : ''}`}
+                                                        } ${selectedSlot === currentIdx && !disabled ? 'text-white' : ''}`}
                                                         disabled={disabled}
                                                         onClick={() => {
                                                             if (!disabled) {
@@ -249,7 +249,7 @@ export default function EditAppointment({
                             <Input id="contact_phone" name="contact_phone" value={formData.contact_phone} onChange={handleChange} required />
                         </div>
                     </div>
-                    <div className="flex items-center justify-end gap-4">
+                    <div className="flex items-center justify-end gap-2">
                         <Button type="button" variant="secondary" onClick={() => router.visit(route('adminappointments.index'))}>
                             Cancel
                         </Button>

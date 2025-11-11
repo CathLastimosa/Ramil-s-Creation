@@ -3,12 +3,13 @@
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Events\AppointmentCreated;
 use Illuminate\Support\Facades\Broadcast;
 
 Route::get('/admin', function () { //landing page for admin
     return Inertia::render('welcome');
 })->name('welcome');
+
+require __DIR__ . '/package.php';
 
 Route::prefix('package')->group(function () {
     Route::get('{id}', [HomeController::class, 'package'])->name('home.package');
@@ -26,7 +27,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
-require __DIR__ . '/package.php';
 require __DIR__ . '/booking.php';
 require __DIR__ . '/messages.php';
 require __DIR__ . '/staff.php';

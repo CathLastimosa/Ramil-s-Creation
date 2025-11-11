@@ -8,7 +8,6 @@ import {
     CalendarCheck2,
     CalendarRange,
     ClipboardMinus,
-    Folder,
     Footprints,
     LayoutGrid,
     MessageCircle,
@@ -24,7 +23,6 @@ export function AppSidebar() {
     const pendingBookingsCount = (props.pendingBookingsCount as number) ?? 0;
     const reservedAppointmentsCount = (props.reservedAppointmentsCount as number) ?? 0;
     const incomingMessagesCount = (props.incomingMessagesCount as number) ?? 0;
-
 
     const mainNavItems: NavItem[] = [
         {
@@ -51,7 +49,6 @@ export function AppSidebar() {
             icon: MessageCircle,
             isActive: true,
             badge: incomingMessagesCount > 0 ? incomingMessagesCount : undefined,
-
         },
         {
             title: 'Staff',
@@ -100,11 +97,6 @@ export function AppSidebar() {
             href: '/report',
             icon: ClipboardMinus,
             isActive: true,
-        },
-        {
-            title: 'User Manual',
-            href: '/user-manual',
-            icon: Folder,
         },
     ];
 

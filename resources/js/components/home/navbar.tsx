@@ -10,6 +10,7 @@ const Navbar: React.ComponentType<{ packages: any[] }> = ({ packages }) => {
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [showNews, setShowNews] = useState(true);
+    const [showTooltip, setShowTooltip] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -108,11 +109,22 @@ const Navbar: React.ComponentType<{ packages: any[] }> = ({ packages }) => {
                             </button>
 
                             {/* Packages Dropdown */}
-                            <div className="relative" onMouseEnter={() => setOpenDropdown('packages')} onMouseLeave={() => setOpenDropdown(null)}>
+                            <div
+                                className="relative"
+                                onMouseEnter={() => {
+                                    setOpenDropdown('packages');
+                                    setShowTooltip(true);
+                                }}
+                                onMouseLeave={() => {
+                                    setOpenDropdown(null);
+                                    setShowTooltip(false);
+                                }}
+                            >
                                 <button
                                     onClick={() => {
                                         scrollToSection('#packages');
                                         setOpenDropdown(null);
+                                        setShowTooltip(false);
                                     }}
                                     className="flex items-center text-black hover:text-red-500"
                                 >
@@ -127,18 +139,27 @@ const Navbar: React.ComponentType<{ packages: any[] }> = ({ packages }) => {
                                     </svg>
                                 </button>
 
-                                {isDropdownOpen('packages') && (
+                                {isDropdownOpen('packages') && packages?.length > 0 && (
                                     <div className="absolute top-full left-0 z-50 w-48 rounded-lg bg-white py-2 shadow-lg">
-                                        {packages?.map((item) => (
+                                        {packages.map((item) => (
                                             <Link
                                                 key={item.package_name}
                                                 href={`/package/${item.package_id}`}
                                                 className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-                                                onClick={() => setOpenDropdown(null)}
+                                                onClick={() => {
+                                                    setOpenDropdown(null);
+                                                    setShowTooltip(false);
+                                                }}
                                             >
                                                 {item.package_name}
                                             </Link>
                                         ))}
+                                    </div>
+                                )}
+
+                                {showTooltip && packages?.length === 0 && (
+                                    <div className="absolute top-full left-0 z-50 w-48 rounded-lg bg-white py-2 shadow-lg">
+                                        <div className="px-4 py-2 text-gray-800">No package found</div>
                                     </div>
                                 )}
                             </div>
@@ -232,9 +253,9 @@ const Navbar: React.ComponentType<{ packages: any[] }> = ({ packages }) => {
                                 </svg>
                             </button>
 
-                            {isDropdownOpen('packages-mobile') && (
+                            {isDropdownOpen('packages-mobile') && packages?.length > 0 && (
                                 <div className="mt-1 space-y-1 pl-4">
-                                    {packages?.map((item) => (
+                                    {packages.map((item) => (
                                         <Link
                                             key={item.package_name}
                                             href={`/package/${item.package_id}`}
@@ -247,6 +268,12 @@ const Navbar: React.ComponentType<{ packages: any[] }> = ({ packages }) => {
                                             {item.package_name}
                                         </Link>
                                     ))}
+                                </div>
+                            )}
+
+                            {isDropdownOpen('packages-mobile') && packages?.length === 0 && (
+                                <div className="mt-1 space-y-1 pl-4">
+                                    <div className="rounded-md px-3 py-2 text-gray-600">No package found</div>
                                 </div>
                             )}
                         </div>
@@ -280,7 +307,7 @@ const Navbar: React.ComponentType<{ packages: any[] }> = ({ packages }) => {
                         </Link>
 
                         <Link
-                            href="/track"
+                            href="/track-booking"
                             className="flex w-full rounded-md px-3 py-2 text-gray-800 hover:bg-gray-100"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >

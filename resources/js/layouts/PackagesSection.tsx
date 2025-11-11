@@ -33,7 +33,7 @@ const PackagesSection: React.FC = () => {
     const currentPackage = packagesData[currentPackageIndex];
 
     return (
-        <section id="packages" className="bg-white sm:py-10 lg:py-40 overflow-hidden">
+        <section id="packages" className="overflow-hidden bg-white pt-16 sm:py-10 lg:py-40 lg:pt-0">
             <div className="max-w-10xl mx-auto px-6 sm:px-8 lg:px-1">
                 <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-5">
                     {/* LEFT COLUMN - CAROUSEL */}

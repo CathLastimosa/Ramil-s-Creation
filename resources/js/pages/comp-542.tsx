@@ -512,10 +512,10 @@ Paid: ₱${service.paid_amount || 'N/A'}`.trim(),
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Calendar" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="flex">
+                <div className="flex flex-col sm:flex-row">
                     <div className="space-y-2">
                         <h6 className="mb-2 font-semibold">Legend</h6>
-                        <div className="flex gap-4 space-y-2">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:gap-4">
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">
                                     <div className="h-4 w-4 rounded border border-emerald-300 bg-emerald-100"></div>

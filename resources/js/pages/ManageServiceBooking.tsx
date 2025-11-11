@@ -9,7 +9,6 @@ import { Dialog } from '@/components/ui/dialog-origin';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/app-layout';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import debounce from 'lodash/debounce';
@@ -82,9 +81,9 @@ export default function ManageServiceBookings({ service_bookings }: { service_bo
                 <CardTitle>Service Bookings</CardTitle>
                 <CardDescription>You can manage service bookings here.</CardDescription>
                 <Tabs defaultValue="all" className="items-left">
-                    <div className="mt-4 flex items-center justify-between">
+                    <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         {/* Tabs */}
-                        <TabsList>
+                        <TabsList className="w-full overflow-x-auto sm:w-auto">
                             <TabsTrigger className="data-[state=active]:text-background" value="all">
                                 All
                             </TabsTrigger>
@@ -98,9 +97,9 @@ export default function ManageServiceBookings({ service_bookings }: { service_bo
                                 Cancelled
                             </TabsTrigger>
                         </TabsList>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                             {/* Search */}
-                            <div className="relative ml-4 max-w-md">
+                            <div className="relative max-w-md">
                                 <Input
                                     id="search"
                                     className="peer ps-9"
@@ -231,13 +230,11 @@ function ServiceBookingAccordion({
                         className="mb-3 overflow-hidden rounded-xl border shadow-sm transition-all duration-200 data-[state=open]:relative data-[state=open]:z-20 data-[state=open]:bg-white data-[state=open]:shadow-xl"
                     >
                         <AccordionTrigger className="p-4">
-                            <div className="flex w-full items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex flex-col text-left">
-                                            <span className="font-semibold text-gray-900">{booking.title}</span>
-                                            <span className="text-sm text-gray-500">{booking.service_name}</span>
-                                        </div>
+                            <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                                    <div className="flex flex-col text-left">
+                                        <span className="font-semibold text-gray-900 dark:text-gray-300">{booking.title}</span>
+                                        <span className="text-sm text-gray-500">{booking.service_name}</span>
                                     </div>
                                     <Badge
                                         variant="outline"
@@ -263,7 +260,7 @@ function ServiceBookingAccordion({
                                         {booking.status}
                                     </Badge>
                                 </div>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center justify-center sm:justify-end">
                                     <span className="rounded-xl bg-violet-200 px-3 py-3 text-sm font-medium text-violet-900">
                                         {formatDateToWords(booking.date)}
                                         <span className="text-violet-300"> | </span>
@@ -273,7 +270,7 @@ function ServiceBookingAccordion({
                             </div>
                         </AccordionTrigger>
 
-                        <AccordionContent className="rounded-b-xl bg-gradient-to-br from-gray-50 to-gray-100 p-8">
+                        <AccordionContent className="rounded-b-xl bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-8 dark:from-black dark:to-black">
                             <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
                                 {/* --- Left: Service Booking Details --- */}
                                 <Card className="overflow-hidden border border-gray-200/70 shadow-sm transition-shadow duration-300 hover:shadow-md">
@@ -360,7 +357,7 @@ function ServiceBookingAccordion({
                             </div>
                         </AccordionContent>
 
-                        <AccordionFooter className="flex w-full items-center justify-between gap-3">
+                        <AccordionFooter className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div className="flex items-center gap-10">
                                 <div className="flex items-center space-x-1">
                                     <div className="p-2">
@@ -388,12 +385,12 @@ function ServiceBookingAccordion({
                                             }}
                                         >
                                             <CheckIcon className="text-green-500" />
-                                            <strong>Completed ?</strong>
+                                            <span className="max-sm:sr-only">Completed ?</span>
                                         </Button>
                                     )}
                                 </div>
                             </div>
-                            <div className="flex gap-3">
+                            <div className="flex gap-1">
                                 <div>
                                     <Dialog>
                                         <DialogTrigger asChild>
@@ -430,25 +427,24 @@ function ServiceBookingAccordion({
                                     </Dialog>
                                 </div>
                                 <div>
-                                    <Button variant="link" onClick={() => router.visit(route('service-bookings.edit', booking.service_booking_id))}>
-                                        <Pencil className="mr-1 text-yellow-600 hover:text-gray-800" size={16} aria-hidden="true" />
-                                        <CardDescription>Edit</CardDescription>
+                                    <Button
+                                        variant="link"
+                                        className="aspect-square cursor-pointer max-sm:p-0"
+                                        onClick={() => router.visit(route('service-bookings.edit', booking.service_booking_id))}
+                                    >
+                                        <Pencil className="text-yellow-600 opacity-60 hover:text-gray-800 sm:-ms-1" size={16} aria-hidden="true" />
+                                        <span className="max-sm:sr-only">Edit</span>
                                     </Button>
                                 </div>
                                 <div>
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <Button
-                                                variant="link"
-                                                className="mr-3 flex cursor-pointer"
-                                                onClick={() => handleDeleteBooking(booking.service_booking_id)}
-                                            >
-                                                <Trash className="size={16} text-red-600 hover:text-gray-800" aria-hidden="true" />
-                                                <CardDescription>Delete</CardDescription>
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>Delete service booking</TooltipContent>
-                                    </Tooltip>
+                                    <Button
+                                        variant="link"
+                                        className="aspect-square cursor-pointer max-sm:p-0"
+                                        onClick={() => handleDeleteBooking(booking.service_booking_id)}
+                                    >
+                                        <Trash className="text-red-600 opacity-60 hover:text-gray-800 sm:-ms-1" aria-hidden="true" />
+                                        <span className="max-sm:sr-only">Delete</span>
+                                    </Button>
                                 </div>
                             </div>
                         </AccordionFooter>

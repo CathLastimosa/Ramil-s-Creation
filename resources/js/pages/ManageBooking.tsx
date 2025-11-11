@@ -127,9 +127,9 @@ export default function ManageBookings({ bookings }: { bookings: BookingType[] }
                 <CardTitle>Event Bookings</CardTitle>
                 <CardDescription>You can manage events here.</CardDescription>
                 <Tabs defaultValue="all" className="items-left">
-                    <div className="mt-4 flex items-center justify-between">
+                    <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         {/* Tabs */}
-                        <TabsList>
+                        <TabsList className="w-full overflow-x-auto sm:w-auto">
                             <TabsTrigger className="data-[state=active]:text-background" value="all">
                                 All
                             </TabsTrigger>
@@ -146,9 +146,9 @@ export default function ManageBookings({ bookings }: { bookings: BookingType[] }
                                 Declined
                             </TabsTrigger>
                         </TabsList>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                             {/* Search */}
-                            <div className="relative ml-4 max-w-md">
+                            <div className="relative max-w-md">
                                 <Input id="search" className="peer ps-9" placeholder="Search Booking" type="search" onChange={onSearchChange} />
                                 <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3 text-muted-foreground/80">
                                     <Search size={16} aria-hidden="true" />
@@ -279,13 +279,11 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                         className="mb-3 overflow-hidden rounded-xl border shadow-sm transition-all duration-200 data-[state=open]:relative data-[state=open]:z-20 data-[state=open]:bg-white data-[state=open]:shadow-xl"
                     >
                         <AccordionTrigger className="p-4">
-                            <div className="flex w-full items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex flex-col text-left">
-                                            <span className="font-semibold text-gray-900 dark:text-gray-300">{booking.event_name}</span>
-                                            <span className="text-sm text-gray-500">{booking.packages?.[0]?.package_name ?? ''}</span>
-                                        </div>
+                            <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                                    <div className="flex flex-col text-left">
+                                        <span className="font-semibold text-gray-900 dark:text-gray-300">{booking.event_name}</span>
+                                        <span className="text-sm text-gray-500">{booking.packages?.[0]?.package_name ?? ''}</span>
                                     </div>
                                     <Badge
                                         variant="outline"
@@ -332,7 +330,7 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                         )}
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center justify-center sm:justify-end">
                                     <span className="rounded-xl bg-red-200 px-3 py-3 text-sm font-medium text-red-900">
                                         {formatDateToWords(booking.event_date)}
                                         <span className="text-red-300"> | </span>
@@ -342,8 +340,8 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                             </div>
                         </AccordionTrigger>
 
-                        <AccordionContent className="rounded-b-xl bg-gradient-to-br from-gray-50 to-gray-100 p-8 dark:from-black dark:to-black">
-                            <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
+                        <AccordionContent className="rounded-b-xl bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-8 dark:from-black dark:to-black">
+                            <div className="grid grid-cols-1 gap-4 sm:gap-10 md:grid-cols-2">
                                 {/* Booking Details */}
                                 <Card className="overflow-hidden border border-gray-200/70 shadow-sm transition-shadow duration-300 hover:shadow-md">
                                     <CardHeader className="flex items-center gap-2 border-b border-gray-200 bg-gray-50/70 px-6 py-4 dark:bg-gray-800">
@@ -404,7 +402,7 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                         <CardTitle className="text-base font-semibold text-gray-800 dark:text-gray-300">Downpayment</CardTitle>
                                     </CardHeader>
 
-                                    <CardContent className="space-y-4 p-6 text-sm text-gray-700 ">
+                                    <CardContent className="space-y-4 p-6 text-sm text-gray-700">
                                         {/* Method */}
                                         <div className="flex items-center justify-between border-b border-gray-100 pb-2">
                                             <span className="text-gray-500 dark:text-gray-300">Payment Method</span>
@@ -454,7 +452,9 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                         {/* Reference No */}
                                         <div className="flex justify-between border-b border-gray-100 pb-2">
                                             <span className="text-gray-500 dark:text-gray-300">Reference No.</span>
-                                            <span className="font-medium text-gray-900 dark:text-gray-300">{booking.payment?.reference_No || '—'}</span>
+                                            <span className="font-medium text-gray-900 dark:text-gray-300">
+                                                {booking.payment?.reference_No || '—'}
+                                            </span>
                                         </div>
 
                                         {/* Amount */}
@@ -510,7 +510,7 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                 <div className="mt-10">
                                     <h4 className="mb-3 text-lg font-semibold text-gray-800 dark:text-gray-300">Selected Services</h4>
                                     <div className="relative">
-                                        <div ref={servicesScrollRef} className="flex gap-4 overflow-x-auto scroll-smooth pb-3 ">
+                                        <div ref={servicesScrollRef} className="flex gap-4 overflow-x-auto scroll-smooth pb-3">
                                             {booking.services.map((srv) => (
                                                 <div
                                                     key={srv.services_id}
@@ -524,7 +524,9 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                                         />
                                                     </div>
                                                     <div className="p-2 text-center">
-                                                        <span className="text-sm font-medium text-gray-900 dark:text-gray-300">{srv.service_name}</span>
+                                                        <span className="text-sm font-medium text-gray-900 dark:text-gray-300">
+                                                            {srv.service_name}
+                                                        </span>
                                                     </div>
                                                 </div>
                                             ))}
@@ -552,7 +554,7 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                             )}
                         </AccordionContent>
 
-                        <AccordionFooter className="flex w-full items-center justify-between gap-3">
+                        <AccordionFooter className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div className="flex items-center gap-10">
                                 <div className="flex items-center space-x-1">
                                     <div className="p-2">
@@ -581,7 +583,7 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                                             className="flex cursor-pointer items-center gap-3 p-1 underline hover:text-green-600"
                                                         >
                                                             <ThumbsUp className="text-green-600" />
-                                                            <strong>Accept Booking</strong>
+                                                            <span className="max-sm:sr-only">Accept Booking</span>
                                                         </Button>
                                                     </DialogTrigger>
 
@@ -627,7 +629,7 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                                     }}
                                                 >
                                                     <ThumbsUp className="text-green-600" />
-                                                    <strong>Accept Booking</strong>
+                                                    <span className="max-sm:sr-only">Accept Booking</span>
                                                 </Button>
                                             )}
 
@@ -639,7 +641,7 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                                         className="flex cursor-pointer items-center gap-3 p-1 underline hover:text-red-600"
                                                     >
                                                         <MessageSquareX className="text-red-500" />
-                                                        <strong>Decline</strong>
+                                                        <span className="max-sm:sr-only">Decline</span>
                                                     </Button>
                                                 </DialogTrigger>
 
@@ -745,15 +747,23 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                     </Dialog>
                                 </div>
                                 <div>
-                                    <Button variant="link" onClick={() => router.visit(route('adminbooking.edit', booking.booking_id))}>
-                                        <Pencil className="mr-1 text-yellow-600 hover:text-gray-800" size={16} aria-hidden="true" />
-                                        <CardDescription>Edit</CardDescription>
+                                    <Button
+                                        variant="link"
+                                        className="aspect-square cursor-pointer max-sm:p-0"
+                                        onClick={() => router.visit(route('adminbooking.edit', booking.booking_id))}
+                                    >
+                                        <Pencil className="text-yellow-600 opacity-60 hover:text-gray-800 sm:-ms-1" size={16} aria-hidden="true" />
+                                        <span className="max-sm:sr-only">Edit</span>
                                     </Button>
                                 </div>
                                 <div>
-                                    <Button variant="link" className="" onClick={() => handleDeleteBooking(booking.booking_id)}>
-                                        <Trash className="mr-1 text-red-600 hover:text-gray-800" aria-hidden="true" />
-                                        <CardDescription>Delete</CardDescription>
+                                    <Button
+                                        variant="link"
+                                        className="aspect-square cursor-pointer max-sm:p-0"
+                                        onClick={() => handleDeleteBooking(booking.booking_id)}
+                                    >
+                                        <Trash className="text-red-600 opacity-60 hover:text-gray-800 sm:-ms-1" aria-hidden="true" />
+                                        <span className="max-sm:sr-only">Delete</span>
                                     </Button>
                                 </div>
                             </div>

@@ -289,23 +289,59 @@ export default function MultiStepForm() {
                 toast.error('Please Select Services to Book!');
             case 1:
                 if (!date || selectedSlot === null) {
-                    toast.error('You must select both an Event Date and Time Slot. Book your event at least a month in advance!');
+                    toast.error('You must select both an Event Date and Time Slot. Book your event at least three (3) months in advance!');
                     return false;
                 }
                 return true;
 
             case 2:
-                return [
-                    data.eventName,
-                    data.guestCount,
-                    data.street,
-                    data.city,
-                    data.barangay,
-                    data.province,
-                    data.fullName,
-                    data.email,
-                    data.phone,
-                ].every((field) => !!field);
+                if (!data.eventName.trim()) {
+                    toast.error('Event Name is required.');
+                    return false;
+                }
+                if (!data.guestCount || isNaN(Number(data.guestCount)) || Number(data.guestCount) <= 0) {
+                    toast.error('Please enter a valid number of guests (at least 1).');
+                    return false;
+                }
+                if (!data.street.trim()) {
+                    toast.error('Street address is required.');
+                    return false;
+                }
+                if (!data.city.trim()) {
+                    toast.error('City is required.');
+                    return false;
+                }
+                if (!data.barangay.trim()) {
+                    toast.error('Barangay is required.');
+                    return false;
+                }
+                if (!data.province.trim()) {
+                    toast.error('Province is required.');
+                    return false;
+                }
+                if (!data.fullName.trim()) {
+                    toast.error('Full Name is required.');
+                    return false;
+                }
+                if (!data.email.trim()) {
+                    toast.error('Email address is required.');
+                    return false;
+                }
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(data.email)) {
+                    toast.error('Please enter a valid email address.');
+                    return false;
+                }
+                if (!data.phone.trim()) {
+                    toast.error('Phone number is required.');
+                    return false;
+                }
+                const phoneRegex = /^09\d{9}$/;
+                if (!phoneRegex.test(data.phone)) {
+                    toast.error('Please enter a valid phone number (11 digits starting with 09).');
+                    return false;
+                }
+                return true;
             case 3:
                 if (!agreeTerms || !emailReminders) {
                     toast.error('You must agree to the terms and opt-in for reminders to proceed.');
@@ -394,59 +430,62 @@ export default function MultiStepForm() {
                                             const price = Number(pkg.package_price);
                                             const discountedPrice = promoPercent ? price - price * (promoPercent / 100) : price;
 
-                                            const formattedPrice = price.toLocaleString();
-                                            const formattedDiscounted = discountedPrice.toLocaleString();
+                                            const formattedPrice = price.toLocaleString('en-US');
 
                                             return (
                                                 <li key={pkg.package_id} className="mx-auto w-full max-w-xs">
                                                     <div
-                                                        className={`group relative flex h-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 p-1 text-center transition-colors ${
+                                                        className={`group relative flex h-full cursor-pointer flex-col justify-between rounded-lg border bg-white p-2 text-center shadow-sm transition-all duration-200 md:p-2 ${
                                                             selectedPackage === pkg.package_id
                                                                 ? 'border-red-500 bg-red-50'
-                                                                : 'border-accent2 hover:border-red-500'
-                                                        }`}
+                                                                : 'border-gray-200 hover:border-red-500 hover:shadow-md'
+                                                        } `}
                                                         onClick={() => handlePackageClick(pkg.package_id)}
                                                     >
+                                                        {/* Package Name */}
                                                         <div className="flex flex-1 items-center justify-center">
-                                                            <strong className="text-lg md:text-xl">{pkg.package_name}</strong>
+                                                            <strong className="text-lg font-semibold text-gray-800 md:text-xl">
+                                                                {pkg.package_name}
+                                                            </strong>
                                                         </div>
 
-                                                        <div>
+                                                        {/* Price Section */}
+                                                        <div className="mt-3 flex flex-col items-center gap-1">
                                                             {promoPercent > 0 ? (
                                                                 <div className="flex items-center justify-center gap-2">
-                                                                    <span className="text-sm text-red-500 md:text-base">
+                                                                    <span className="text-base font-medium text-red-600 md:text-lg">
                                                                         ₱{Number(pkg.discounted_price || 0).toLocaleString('en-US')}
                                                                     </span>
-                                                                    <span className="text-xs text-gray-400 line-through md:text-sm">
+                                                                    <span className="text-sm text-gray-400 line-through md:text-base">
                                                                         ₱{formattedPrice}
                                                                     </span>
-                                                                    <span className="rounded bg-red-100 px-2 py-0.5 text-xs text-red-500">
+                                                                    <span className="rounded bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-600">
                                                                         -{promoPercent}%
                                                                     </span>
                                                                 </div>
                                                             ) : (
-                                                                <span className="text-sm text-red-500 md:text-base">
+                                                                <span className="text-base font-medium text-red-600 md:text-lg">
                                                                     ₱{Number(pkg.discounted_price || pkg.package_price).toLocaleString('en-US')}
                                                                 </span>
                                                             )}
                                                         </div>
 
+                                                        {/* Optional underline for selected state */}
                                                         {/* <span
-                                                            className={`absolute bottom-0 left-1/4 h-0.5 w-1/2 origin-center bg-red-500 transition-transform duration-300 ${selectedPackage === pkg.package_id ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
-                                                                }`}
-                                                        ></span> */}
+    className={`absolute bottom-0 left-1/4 h-0.5 w-1/2 origin-center bg-red-500 transition-transform duration-300 
+      ${selectedPackage === pkg.package_id 
+        ? 'scale-x-100' 
+        : 'scale-x-0 group-hover:scale-x-100'}
+    `}
+  ></span> */}
                                                     </div>
                                                 </li>
-
                                             );
-                                            
                                         })
                                     ) : (
                                         <p>No packages available.</p>
                                     )}
                                 </ul>
-
-                              
 
                                 {/* Related Services */}
                                 {selectedPackage && relatedServices.length > 0 && (
@@ -458,7 +497,9 @@ export default function MultiStepForm() {
                                                     <div
                                                         key={service.services_id}
                                                         onClick={() => handleServiceCheckboxChange(service.services_id)}
-                                                        className={`relative w-[230px] cursor-pointer overflow-hidden rounded-2xl border shadow-md transition-all hover:shadow-xl`}
+                                                        className={`relative w-[230px] cursor-pointer overflow-hidden rounded-2xl border shadow-md transition-all hover:shadow-xl ${
+                                                            !isChecked ? 'opacity-50 grayscale' : ''
+                                                        }`}
                                                     >
                                                         <div className="flex h-[230px] w-full items-center justify-center overflow-hidden bg-gray-100">
                                                             <img
@@ -506,7 +547,7 @@ export default function MultiStepForm() {
                                             mode="single"
                                             selected={date}
                                             onSelect={setDate}
-                                            className="mt-3 h-115 w-full rounded-lg border lg:w-100"
+                                            className="mt-3 h-100 w-80 rounded-lg border lg:h-110 lg:w-90"
                                             captionLayout="dropdown"
                                             disabled={(day) => {
                                                 const today = new Date();
@@ -786,7 +827,6 @@ export default function MultiStepForm() {
                                         />
                                         <InputError message={errors.fullName} />
                                     </div>
-                                    <InputError message={errors.fullName} />
                                     {/* Email Input */}
                                     <div className="relative mb-2">
                                         <MailIcon className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" size={16} />
@@ -814,8 +854,6 @@ export default function MultiStepForm() {
                                         />
                                         <InputError message={errors.phone} />
                                     </div>
-
-                                    <InputError message={errors.phone} />
                                 </div>
                             </div>
                         )}
@@ -922,9 +960,11 @@ export default function MultiStepForm() {
 
                                             return (
                                                 <details className="rounded-xl border bg-white p-4">
-                                                    <summary className="font-medium">Price & Policy - ₱{discountedPrice.toLocaleString()}</summary>
+                                                    <summary className="font-medium">
+                                                        Price & Policy - ₱{Number(discountedPrice).toLocaleString('en-US')}
+                                                    </summary>
                                                     <div className="mt-2 text-sm text-gray-700">
-                                                        <p>Total Amount Due: ₱{discountedPrice.toLocaleString()}</p>
+                                                        <p>Total Amount Due: ₱{Number(discountedPrice).toLocaleString('en-US')}</p>
                                                         <p className="mt-2">
                                                             Tax & Fees Included. Cancellations or modifications can be made 24 hours before the event.
                                                         </p>
@@ -991,10 +1031,10 @@ export default function MultiStepForm() {
                                                                 <p>Original Price: ₱{originalPrice.toLocaleString()}</p>
                                                                 <p>
                                                                     Discount ({promoPercent}%): -₱
-                                                                    {(originalPrice - discountedPrice).toLocaleString()}
+                                                                    {Number(originalPrice - discountedPrice).toLocaleString('en-US')}
                                                                 </p>
                                                                 <p className="mt-2 text-lg font-semibold text-green-700">
-                                                                    Total Amount Due: ₱{discountedPrice.toLocaleString()}
+                                                                    Total Amount Due: ₱{Number(discountedPrice).toLocaleString('en-US')}
                                                                 </p>
                                                             </>
                                                         ) : (
@@ -1181,23 +1221,26 @@ export default function MultiStepForm() {
                                                                 {promoPercent > 0 ? (
                                                                     <>
                                                                         <CardDescription>
-                                                                            Original Price: ₱{originalPrice.toLocaleString()}
+                                                                            Original Price: ₱{originalPrice.toLocaleString('en-US')}
                                                                         </CardDescription>
                                                                         <CardDescription>
-                                                                            Discount ({promoPercent}%): -₱{calculatedDiscountedPrice.toLocaleString()}
+                                                                            Discount ({promoPercent}%): -₱
+                                                                            {Number(originalPrice - calculatedDiscountedPrice).toLocaleString(
+                                                                                'en-US',
+                                                                            )}
                                                                         </CardDescription>
                                                                         <hr />
                                                                         <CardHeader>
                                                                             <b>Total Amount Due: </b>
                                                                             <span className="text-red-700">
-                                                                                ₱{calculatedDiscountedPrice.toLocaleString()}
+                                                                                ₱{Number(calculatedDiscountedPrice).toLocaleString('en-US')}
                                                                             </span>
                                                                         </CardHeader>
                                                                         <hr />
                                                                         <CardHeader>
                                                                             <b>Down Payment (50%): </b>
                                                                             <span className="text-green-700">
-                                                                                ₱{(calculatedDiscountedPrice / 2).toLocaleString()}
+                                                                                ₱{Number(calculatedDiscountedPrice / 2).toLocaleString('en-US')}
                                                                             </span>
                                                                             <CardDescription>
                                                                                 Please pay the down payment to confirm your booking.
@@ -1207,18 +1250,20 @@ export default function MultiStepForm() {
                                                                 ) : (
                                                                     <>
                                                                         <CardDescription>
-                                                                            Package Price: ₱{originalPrice.toLocaleString()}
+                                                                            Package Price: ₱{originalPrice.toLocaleString('en-US')}
                                                                         </CardDescription>
                                                                         <hr />
                                                                         <CardHeader>
                                                                             <b>Total Amount Due: </b>
-                                                                            <span className="text-red-700">₱{originalPrice.toLocaleString()}</span>
+                                                                            <span className="text-red-700">
+                                                                                ₱{originalPrice.toLocaleString('en-US')}
+                                                                            </span>
                                                                         </CardHeader>
                                                                         <hr />
                                                                         <CardHeader>
                                                                             <b>Down Payment (50%): </b>
                                                                             <span className="text-green-700">
-                                                                                ₱{(originalPrice / 2).toLocaleString()}
+                                                                                ₱{Number(originalPrice / 2).toLocaleString('en-US')}
                                                                             </span>
                                                                             <CardDescription>
                                                                                 Please pay the down payment to confirm your booking.
@@ -1313,8 +1358,6 @@ export default function MultiStepForm() {
                                                 if (paymentMethod === '2') {
                                                     if (!data.reference_no || !data.payment_proof) return;
                                                 }
-                                            } else {
-                                                toast.error('Please complete all required fields before proceeding.');
                                             }
                                         }}
                                     >

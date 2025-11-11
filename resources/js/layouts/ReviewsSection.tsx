@@ -19,7 +19,7 @@ const ReviewsSection: React.FC<{ feedbacks: any[] }> = ({ feedbacks }) => {
     return (
         <>
             <Gallery />
-            <section id="reviews" className="relative -mt-10 overflow-hidden pb-10">
+            <section id="reviews" className="relative -mt-10 overflow-hidden pt-16 pb-10 lg:pt-0">
                 <div className="max-w-8xl mx-auto px-6 sm:px-8 lg:px-10">
                     {/* Section Header */}
                     <motion.div

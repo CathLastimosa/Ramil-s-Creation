@@ -74,15 +74,16 @@ export default function EditServices({ booking, allServices, packages }: { booki
                             </div>
                         ))}
                     </div>
-                    <div className="flex items-center gap-4">
-                        <Button type="submit">Update Services</Button>
+                    <div className="flex items-center gap-2 justify-end">
                         <Button
                             type="button"
-                            variant="outline"
+                            variant="secondary"
                             onClick={() => router.visit(route('adminbooking.index'))}
                         >
                             Cancel
                         </Button>
+                        <Button type="submit">Update Services</Button>
+                        
                     </div>
                 </form>
             </div>

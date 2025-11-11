@@ -567,7 +567,7 @@ export function EventCalendar({
             }
         >
             <CalendarDndProvider onEventUpdate={handleEventUpdate}>
-                <div className={cn('flex items-center justify-between p-2 sm:p-4', className)}>
+                <div className={cn('flex flex-col gap-2 p-2 sm:flex-row sm:items-center sm:justify-between sm:p-4', className)}>
                     <div className="flex items-center gap-1 sm:gap-4">
                         <Button variant="outline" className="max-[479px]:aspect-square max-[479px]:p-0!" onClick={handleToday}>
                             <RiCalendarCheckLine className="min-[480px]:hidden" size={16} aria-hidden="true" />
@@ -583,7 +583,7 @@ export function EventCalendar({
                         </div>
                         <h2 className="text-sm font-semibold sm:text-lg md:text-xl">{viewTitle}</h2>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                         <Button
                             variant="secondary"
                             className="max-[479px]:aspect-square max-[479px]:p-0!"
@@ -671,9 +671,9 @@ export function EventCalendar({
                     blockedtimes={blockedtimes}
                 />
                 {isCreateChooserOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                         <div className="absolute inset-0 bg-black/40" onClick={() => setIsCreateChooserOpen(false)} />
-                        <div className="relative rounded bg-white p-4 shadow-lg dark:bg-gray-600">
+                        <div className="relative w-full max-w-sm rounded bg-white p-4 shadow-lg dark:bg-gray-600">
                             <h3 className="mb-2 text-lg font-medium dark:text-gray-100">Create new</h3>
                             <div className="flex flex-col gap-2">
                                 <Button
