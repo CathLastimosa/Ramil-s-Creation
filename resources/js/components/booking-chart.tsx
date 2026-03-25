@@ -56,10 +56,15 @@ export default function BookingChart({ bookingsData, period }: BookingChartProps
                                 cursor={{ stroke: color, strokeWidth: 1, strokeDasharray: '2 2' }}
                                 content={({ active, payload }) => {
                                     if (active && payload && payload.length) {
-                                        const value = payload[0].value as number;
+                                        const { date, value } = payload[0].payload as BookingData;
+                                        const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                                            month: 'short',
+                                            day: 'numeric',
+                                            year: 'numeric',
+                                        });
                                         return (
-                                            <div className="pointer-events-none rounded-lg border border-border bg-background/95 p-2 shadow-lg backdrop-blur-sm">
-                                                <p className="text-sm font-semibold text-foreground">{value} bookings</p>
+                                            <div className="pointer-events-none rounded-lg border border-border bg-background/95 p-1 shadow-lg backdrop-blur-sm">
+                                                <p className="text-xs text-foreground">{formattedDate}: {value} bookings</p>
                                             </div>
                                         );
                                     }

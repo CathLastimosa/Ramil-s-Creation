@@ -25,6 +25,7 @@ type PageProps = {
     totalReviews: number;
     averageRating: number;
     ratingCounts: Record<number, number>;
+    previousYearReviews?: number;
 };
 
 // Helper to format counts (ex: 2000 → 2.0k)
@@ -34,40 +35,40 @@ function formatCount(count: number) {
 }
 
 export default function Feedback() {
-    const { feedbacks, totalReviews, averageRating, ratingCounts } = usePage<PageProps>().props;
+    const { feedbacks, totalReviews, averageRating, ratingCounts, previousYearReviews = 0 } = usePage<PageProps>().props;
+
+    // Calculate growth percentage
+    const growthPercentage = previousYearReviews > 0 ? ((totalReviews - previousYearReviews) / previousYearReviews) * 100 : 0;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Feedbacks" />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
-                {/* ===== Summary Section ===== */}
                 <div>
                     <h2 className="mb-6 text-xl font-semibold text-gray-800">Feedback Summary</h2>
 
-                    {/* Top summary cards (like image) */}
                     <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-                        {/* Total Reviews Card */}
-                        <div className="flex flex-col items-start justify-center rounded-xl bg-accent2 p-6 shadow-lg transition-colors">
-                            <div className="text-sm font-medium text-background">Total Reviews</div>
+                        <div className="flex flex-col items-start justify-center rounded-xl bg-accent2 p-6 shadow-lg transition-colors dark:bg-muted">
+                            <div className="text-sm font-medium text-background dark:text-white">Total Reviews</div>
 
                             <div className="mt-2 flex items-end gap-2">
-                                <div className="text-4xl font-semibold text-background">{formatCount(totalReviews)}</div>
+                                <div className="text-4xl font-semibold text-background dark:text-white">{formatCount(totalReviews)}</div>
                                 <div className="flex items-center gap-1 rounded-full bg-pink-50 px-2 py-0.5 text-xs font-medium text-pink-600">
                                     <RiArrowUpSLine size={14} />
-                                    <span>+5%</span>
+                                    <span>+{growthPercentage.toFixed(1)}%</span>
                                 </div>
                             </div>
 
-                            <div className="mt-1 text-sm text-background">Growth in reviews this year</div>
+                            <div className="mt-1 text-sm text-background dark:text-gray-300">Growth in reviews this year</div>
                         </div>
 
                         {/* Average Rating Card */}
-                        <div className="flex flex-col items-start justify-center rounded-xl bg-cta p-5 shadow-lg">
-                            <div className="text-sm font-medium text-background">Average Rating</div>
+                        <div className="flex flex-col items-start justify-center rounded-xl bg-cta p-5 shadow-lg dark:bg-muted">
+                            <div className="text-sm font-medium text-background dark:text-white">Average Rating</div>
 
                             <div className="mt-2 flex items-end gap-3">
-                                <div className="text-4xl font-semibold text-background">{averageRating.toFixed(1)}</div>
+                                <div className="text-4xl font-semibold text-background dark:text-white">{averageRating.toFixed(1)}</div>
                                 <div className="flex items-center gap-1">
                                     {[1, 2, 3, 4, 5].map((star) => (
                                         <RiStarFill
@@ -79,7 +80,7 @@ export default function Feedback() {
                                 </div>
                             </div>
 
-                            <div className="mt-1 text-sm text-background">Average rating this year</div>
+                            <div className="mt-1 text-sm text-background dark:text-gray-300">Average rating this year</div>
                         </div>
 
                         {/* Ratings Breakdown */}
@@ -92,12 +93,12 @@ export default function Feedback() {
                                     level === 5
                                         ? '#10b981' // green
                                         : level === 4
-                                          ? '#e879f9' // pink
-                                          : level === 3
-                                            ? '#facc15' // yellow
-                                            : level === 2
-                                              ? '#38bdf8' // sky blue
-                                              : '#f97316'; // orange
+                                            ? '#e879f9' // pink
+                                            : level === 3
+                                                ? '#facc15' // yellow
+                                                : level === 2
+                                                    ? '#38bdf8' // sky blue
+                                                    : '#f97316'; // orange
 
                                 return (
                                     <div key={`rating-level-${level}`} className="flex items-center gap-2">
@@ -119,18 +120,17 @@ export default function Feedback() {
                 <div>
                     {feedbacks.map((feedback, index) => (
                         <div key={feedback.id}>
-                            <div className="grid grid-cols-1 bg-white p-6 md:grid-cols-2">
-                                {/* User Info */}
+                            <div className="grid grid-cols-1 bg-white p-6 md:grid-cols-2 dark:bg-muted">
                                 <div className="flex gap-4">
                                     <Avatar>
-                                        <AvatarFallback className="bg-secondary font-medium text-accent2">
-                                            {feedback.booking.contact_name.charAt(0).toUpperCase()}
+                                        <AvatarFallback className="bg-secondary font-medium text-accent2 dark:bg-gray-500">
+                                            {feedback.booking?.contact_name?.charAt(0).toUpperCase() || 'U'}
                                         </AvatarFallback>
                                     </Avatar>
                                     <div>
-                                        <div className="font-semibold">{feedback.booking.contact_name}</div>
-                                        <div className="text-sm text-gray-600">{feedback.booking.contact_email}</div>
-                                        <div className="text-sm text-gray-600">{feedback.booking.event_name}</div>
+                                        <div className="font-semibold dark:text-white">{feedback.booking?.contact_name || 'Unknown'}</div>
+                                        <div className="text-sm text-gray-600 dark:text-gray-300">{feedback.booking?.contact_email || 'N/A'}</div>
+                                        <div className="text-sm text-gray-600 dark:text-gray-300">{feedback.booking?.event_name || 'N/A'}</div>
                                     </div>
                                 </div>
 
@@ -145,8 +145,10 @@ export default function Feedback() {
                                                 />
                                             ))}
                                         </div>
-                                        <div className="text-sm text-gray-600">{new Date(feedback.created_at).toLocaleDateString()}</div>
-                                        <div className="text-sm">{feedback.feedback}</div>
+                                        <div className="text-sm text-gray-600 dark:text-gray-300">
+                                            {new Date(feedback.created_at).toLocaleDateString()}
+                                        </div>
+                                        <div className="text-sm dark:text-white">{feedback.feedback}</div>
                                     </div>
                                     <button
                                         onClick={() => {

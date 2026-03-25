@@ -1,14 +1,14 @@
 'use client';
 
-import Footer from '@/layouts/Footer';
 import Navbar from '@/components/home/navbar';
 import News from '@/components/home/news-ticker';
 import WavesBackground from '@/components/home/waves-background';
 import { Button } from '@/components/ui/button-shad';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar } from '@/components/ui/shadcn-calendar';
+import Footer from '@/layouts/Footer';
 import { Head, usePage } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface BookingTime {
     from: string;
@@ -32,12 +32,11 @@ interface PageProps {
     blockedtimes: Record<string, BlockedTime[]>;
     servicebookingtimes: Record<string, BlockedTime[]>;
 }
-type promoType={
-    package_id:string;
-    package_name:string;
+type promoType = {
+    package_id: string;
+    package_name: string;
     package_promo: number;
-}
-
+};
 
 export default function CalendarPage() {
     const { bookedTimes = {}, blockedtimes = {}, servicebookingtimes = {} } = usePage().props as unknown as PageProps;
@@ -45,7 +44,6 @@ export default function CalendarPage() {
     const { packages, promo } = usePage<{
         packages: PackageDetails[];
         promo: promoType;
-
     }>().props;
     const [showNews, setShowNews] = useState(true);
 
@@ -61,6 +59,7 @@ export default function CalendarPage() {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
     const formatLocalDate = (date: Date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -70,37 +69,51 @@ export default function CalendarPage() {
 
     const getDateStatus = (date: Date) => {
         const dateKey = formatLocalDate(date);
-        const hasBookings = bookedTimes[dateKey] && bookedTimes[dateKey].length > 0;
-        const hasBlocked = blockedtimes[dateKey] && blockedtimes[dateKey].length > 0;
-        const hasServiceBookings = servicebookingtimes[dateKey] && servicebookingtimes[dateKey].length > 0;
+        const fullyUnavailable = bookingSlots.every((slot) => {
+            const booked =
+                bookedTimes[dateKey]?.some(
+                    (t) =>
+                        (slot.from >= t.from && slot.from < t.to) ||
+                        (slot.to > t.from && slot.to <= t.to) ||
+                        (slot.from <= t.from && slot.to >= t.to),
+                ) ?? false;
 
-        if (hasBlocked) return 'blocked';
-        if (hasBookings) return 'booked';
-        if (hasServiceBookings) return 'service';
-        return 'available';
+            const blocked =
+                blockedtimes[dateKey]?.some(
+                    (t) =>
+                        (slot.from >= t.from && slot.from < t.to) ||
+                        (slot.to > t.from && slot.to <= t.to) ||
+                        (slot.from <= t.from && slot.to >= t.to),
+                ) ?? false;
+
+            const servicebooked =
+                servicebookingtimes[dateKey]?.some(
+                    (t) =>
+                        (slot.from >= t.from && slot.from < t.to) ||
+                        (slot.to > t.from && slot.to <= t.to) ||
+                        (slot.from <= t.from && slot.to >= t.to),
+                ) ?? false;
+
+            return booked || blocked || servicebooked;
+        });
+
+        return fullyUnavailable ? 'blocked' : 'available';
     };
 
     const modifiers = {
-        booked: (date: Date) => getDateStatus(date) === 'booked',
         blocked: (date: Date) => getDateStatus(date) === 'blocked',
-        service: (date: Date) => getDateStatus(date) === 'service',
+        today: (date: Date) => date.toDateString() === new Date().toDateString(),
     };
 
     const modifiersStyles = {
-        booked: {
-            backgroundColor: '#fef2f2',
-            color: '#dc2626',
-            fontWeight: 'bold',
-        },
         blocked: {
             backgroundColor: '#f3f4f6',
             color: '#6b7280',
             textDecoration: 'line-through',
         },
-        service: {
-            backgroundColor: '#fef3c7',
-            color: '#d97706',
-            fontWeight: 'bold',
+        today: {
+            backgroundColor: '#f43f5e', // rose-500
+            color: '#ffffff',
         },
     };
 
@@ -147,7 +160,7 @@ export default function CalendarPage() {
             {showNews && <News promo={promo?.package_promo} />}
             <section className="flex min-h-screen flex-col bg-white">
                 <Navbar packages={packages} />
-                <div className="container mx-auto p-6 mt-25">
+                <div className="container mx-auto mt-25 p-6">
                     <Card className="mx-auto max-w-6xl">
                         <CardHeader>
                             <CardTitle className="text-center text-3xl">Event Calendar</CardTitle>
@@ -171,16 +184,8 @@ export default function CalendarPage() {
                                         <h3 className="mb-2 text-lg font-semibold">Legend</h3>
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2">
-                                                <div className="h-4 w-4 rounded border border-red-300 bg-red-100"></div>
-                                                <span className="text-sm">Booked Events</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
                                                 <div className="h-4 w-4 rounded border border-gray-300 bg-gray-100 line-through"></div>
-                                                <span className="text-sm">Blocked Dates</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <div className="h-4 w-4 rounded border border-yellow-300 bg-yellow-100"></div>
-                                                <span className="text-sm">Service Bookings</span>
+                                                <span className="text-sm">Unavailable Dates</span>
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <div className="h-4 w-4 rounded border border-gray-300 bg-white"></div>
@@ -211,9 +216,7 @@ export default function CalendarPage() {
                                                                     key={idx}
                                                                     variant={unavailable ? 'ghost' : 'ghost'}
                                                                     className={`p-2 text-sm ${
-                                                                        unavailable
-                                                                            ? 'cursor-not-allowed text-gray-400 line-through'
-                                                                            : 'text-accent2'
+                                                                        unavailable ? 'cursor-not-allowed text-gray-400 line-through' : 'text-accent2'
                                                                     }`}
                                                                     disabled
                                                                 >

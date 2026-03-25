@@ -107,6 +107,9 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
                                         date={day}
                                         className="relative"
                                         onClick={() => {
+                                            const today = new Date();
+                                            today.setHours(0, 0, 0, 0);
+                                            if (day < today) return;
                                             if (hasBlocked) {
                                                 onEventSelect(blockedEvents[0]);
                                             } else {

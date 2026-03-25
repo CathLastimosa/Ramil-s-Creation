@@ -7,7 +7,6 @@ use App\Models\Bookings;
 use App\Models\Messages;
 use App\Models\Staff;
 use App\Models\User;
-use App\Notifications\MessageSendingNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +15,7 @@ use Inertia\Inertia;
 use App\Jobs\SendMessageNotification;
 use App\Models\EmailNotification;
 use App\Events\MessageCreated;
+
 class AdminMessagesController extends Controller
 {
     /**

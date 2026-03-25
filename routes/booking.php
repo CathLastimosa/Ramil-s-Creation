@@ -30,7 +30,7 @@ Route::prefix('admin-booking')->group(function () {
     Route::put('{id}/decline', [AdminBookingController::class, 'decline'])->name('adminbooking.decline');
     Route::put('{id}/complete', [AdminBookingController::class, 'complete'])->name('adminbooking.complete');
     Route::put('{id}/payment-update', [AdminBookingController::class, 'updatePayment'])->name('adminbooking.payment.update');
-    Route::get('{bookingId}/report-pdf', [AdminBookingController::class, 'report'])->name('adminbooking.report.pdf');
+    Route::get('{transaction_number}/report-pdf', [AdminBookingController::class, 'report'])->name('adminbooking.report.pdf');
     Route::put('{bookingId}/verify-email', [AdminBookingController::class, 'verifyEmail'])->name('adminbooking.verify-email');
 });
 

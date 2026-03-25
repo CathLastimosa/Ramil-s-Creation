@@ -51,7 +51,6 @@ export default function Package({ packages }: { packages: PackageType[] }) {
         }
     }
 
-    // Manage statuses locally for inline edit
     const [statuses, setStatuses] = useState<Record<string, string>>(() =>
         packages.reduce(
             (acc, pkg) => {
@@ -74,7 +73,6 @@ export default function Package({ packages }: { packages: PackageType[] }) {
         );
     }
 
-    // State for view package dialog
     const [selectedPackage, setSelectedPackage] = useState<PackageType | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 

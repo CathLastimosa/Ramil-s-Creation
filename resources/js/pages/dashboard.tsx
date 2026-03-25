@@ -125,18 +125,26 @@ export default function Dashboard() {
         year: '',
     });
 
+    const [appliedFilters, setAppliedFilters] = useState({
+        month: '',
+        year: '',
+    });
+
     const applyFilters = () => {
+        setAppliedFilters({ ...filters });
         router.get(route('dashboard'), { ...filters }, { preserveState: true, replace: true });
     };
 
     const clearFilters = () => {
         setFilters({ month: '', year: '' });
+        setAppliedFilters({ month: '', year: '' });
         router.get(route('dashboard'), {}, { preserveState: true, replace: true });
     };
 
     const clearFilter = (filterKey: keyof typeof filters) => {
         const newFilters = { ...filters, [filterKey]: '' };
         setFilters(newFilters);
+        setAppliedFilters(newFilters);
         router.get(route('dashboard'), { ...newFilters }, { preserveState: true, replace: true });
     };
 
@@ -156,10 +164,10 @@ export default function Dashboard() {
     };
 
     const getPeriod = () => {
-        if (filters.month && filters.year) {
-            return `${monthNames[filters.month]} ${filters.year}`;
-        } else if (filters.year) {
-            return filters.year;
+        if (appliedFilters.month && appliedFilters.year) {
+            return `${monthNames[appliedFilters.month]} ${appliedFilters.year}`;
+        } else if (appliedFilters.year) {
+            return appliedFilters.year;
         } else {
             return 'Current Year';
         }
@@ -196,17 +204,17 @@ export default function Dashboard() {
                         <div className="text-lg font-semibold text-red-950 dark:text-white">{greeting}!</div>
                     </div>
                     <div className="flex gap-2">
-                        {filters.month && (
+                        {appliedFilters.month && (
                             <Badge variant="secondary" className="flex items-center gap-1">
-                                Month: {monthNames[filters.month]}
+                                Month: {monthNames[appliedFilters.month]}
                                 <button type="button" className="h-3 w-3 cursor-pointer" onClick={() => clearFilter('month')}>
                                     <X className="h-3 w-3" />
                                 </button>
                             </Badge>
                         )}
-                        {filters.year && (
+                        {appliedFilters.year && (
                             <Badge variant="secondary" className="flex items-center gap-1">
-                                Year: {filters.year}
+                                Year: {appliedFilters.year}
                                 <button type="button" className="h-3 w-3 cursor-pointer" onClick={() => clearFilter('year')}>
                                     <X className="h-3 w-3" />
                                 </button>

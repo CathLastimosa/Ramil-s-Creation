@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Staff;
-use App\Models\StaffAvailability; // Ensure this model exists; create if needed
+use App\Models\StaffAvailability; 
+use Carbon\Carbon;
 
 class StaffController extends Controller
 {
@@ -28,6 +29,47 @@ class StaffController extends Controller
         }
 
         $staffMembers = $query->get();
+
+        // Update staff status based on current bookings and service bookings
+        $now = Carbon::now();
+        $today = $now->toDateString();
+        $currentTime = $now->toTimeString();
+
+        foreach ($staffMembers as $staff) {
+            $isOnDuty = false;
+
+            foreach ($staff->bookings as $booking) {
+                if (
+                    $booking->event_date == $today &&
+                    $booking->event_time_from <= $currentTime &&
+                    $booking->event_time_to >= $currentTime
+                ) {
+                    $isOnDuty = true;
+                    break;
+                }
+            }
+
+            if (!$isOnDuty) {
+                foreach ($staff->serviceBookings as $serviceBooking) {
+                    if (
+                        $serviceBooking->date == $today &&
+                        $serviceBooking->start_time <= $currentTime &&
+                        $serviceBooking->end_time >= $currentTime
+                    ) {
+                        $isOnDuty = true;
+                        break;
+                    }
+                }
+            }
+
+            if ($isOnDuty) {
+                $staff->status = 'on_duty';
+            } elseif ($staff->status !== 'inactive') {
+                $staff->status = 'active';
+            }
+
+            $staff->save();
+        }
 
         return Inertia::render('Staff/staff', [
             'staff' => $staffMembers,
@@ -86,7 +128,6 @@ class StaffController extends Controller
             } elseif ($status === 'blocked') {
                 $startTime = null;
                 $endTime = null;
-                // Could set reason if provided, but not in form
             }
 
             StaffAvailability::create([
@@ -114,7 +155,7 @@ class StaffController extends Controller
     public function edit(string $id)
     {
         $staff = Staff::findOrFail($id);
-        return Inertia::render('EditStaff/staff-details',[
+        return Inertia::render('EditStaff/staff-details', [
             'staff' => $staff,
         ]);
     }
@@ -128,6 +169,7 @@ class StaffController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|unique:staff,email,' . $id . ',staff_id',
             'contact' => 'nullable|string|max:20',
+            'color' => 'nullable|string|max:7',
             'role' => 'nullable|string|max:50',
             'status' => 'nullable|in:active,inactive',
         ]);
@@ -137,6 +179,7 @@ class StaffController extends Controller
             'staff_name' => $validated['name'],
             'email' => $validated['email'],
             'contact_no' => $validated['contact'],
+            'color' => $validated['color'],
             'role' => $validated['role'],
             'status' => $validated['status'] ?? $staff->status,
         ]);
@@ -174,6 +217,6 @@ class StaffController extends Controller
             return sprintf('%02d:%02d:00', $hour, $minute);
         }
 
-        return null; 
+        return null;
     }
 }

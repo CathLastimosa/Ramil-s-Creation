@@ -6,6 +6,16 @@ import Pusher from 'pusher-js';
 import { type ReactNode, useEffect } from 'react';
 import { toast } from 'sonner';
 
+// Helper function to format date
+const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+};
+
 interface AppLayoutProps {
     children: ReactNode;
     breadcrumbs?: BreadcrumbItem[];
@@ -50,12 +60,12 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
             const a = data.appointment || {};
 
             const when = a.appointment_date
-                ? `${a.appointment_date} ${a.appointment_time_from || ''}-${a.appointment_time_to || ''}`
+                ? `${formatDate(a.appointment_date)} ${a.appointment_time_from || ''}-${a.appointment_time_to || ''}`
                 : 'scheduled time';
 
             if (type === 'booking') {
                 const who = a.contact_name || a.contact_email || 'New booking';
-                const tx = a.transaction_number ?  `(${a.transaction_number})` : '';
+                const tx = a.transaction_number ? `(${a.transaction_number})` : '';
                 toast.success('New Booking', {
                     description: `${who}${tx} — ${when}`,
                 });
@@ -82,7 +92,7 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
     return (
         <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
             {children}
-            <Toaster richColors duration={5000} position="top-center" closeButton={true} />
+            <Toaster richColors duration={6000} position="top-center" closeButton={true} />
         </AppLayoutTemplate>
     );
 };

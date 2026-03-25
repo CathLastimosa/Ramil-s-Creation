@@ -14,8 +14,9 @@ interface StaffType {
     staff_name: string;
     email: string;
     contact_no: string;
+    color: string;
     role: string;
-    status: 'active' | 'inactive';
+    status: 'active' | 'inactive' | 'on_duty';
 }
 
 interface Props {
@@ -40,6 +41,7 @@ export default function EditStaffDetails({ staff }: Props) {
         email: staff.email || '',
         contact: staff.contact_no || '',
         role: staff.role || '',
+        color: staff.color || '',
         status: staff.status || 'active',
     });
 
@@ -111,14 +113,30 @@ export default function EditStaffDetails({ staff }: Props) {
                         </div>
 
                         <div className="space-y-2">
+                            <Label htmlFor="color">Staff Color Tag</Label>
+                            <div className="flex items-center gap-3">
+                                <Input
+                                    id="color"
+                                    type="color"
+                                    value={data.color}
+                                    onChange={(e) => setData('color', e.target.value)}
+                                    className="h-10 w-12 cursor-pointer rounded-md border border-gray-300"
+                                />
+                                <span className="text-sm text-gray-500">Update the color for this staff member</span>
+                            </div>
+                            {errors.color && <p className="text-xs text-red-500">{errors.color}</p>}
+                        </div>
+
+                        <div className="space-y-2">
                             <Label htmlFor="status">Status</Label>
-                            <Select value={data.status} onValueChange={(value: 'active' | 'inactive') => setData('status', value)}>
+                            <Select value={data.status} onValueChange={(value: 'active' | 'inactive' | 'on_duty') => setData('status', value)}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select status" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="active">Active</SelectItem>
                                     <SelectItem value="inactive">Inactive</SelectItem>
+                                    <SelectItem value="on_duty">On Duty</SelectItem>
                                 </SelectContent>
                             </Select>
                             {errors.status && <p className="text-xs text-red-500">{errors.status}</p>}
@@ -139,7 +157,7 @@ export default function EditStaffDetails({ staff }: Props) {
                         </Button>
                     </div>
                 </form>
-            </EditStaffLayout>
+            </EditStaffLayout >
         </>
     );
 }

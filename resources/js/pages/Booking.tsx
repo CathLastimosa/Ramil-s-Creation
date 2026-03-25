@@ -287,6 +287,7 @@ export default function MultiStepForm() {
                     return true;
                 }
                 toast.error('Please Select Services to Book!');
+                return false;
             case 1:
                 if (!date || selectedSlot === null) {
                     toast.error('You must select both an Event Date and Time Slot. Book your event at least three (3) months in advance!');
@@ -343,8 +344,8 @@ export default function MultiStepForm() {
                 }
                 return true;
             case 3:
-                if (!agreeTerms || !emailReminders) {
-                    toast.error('You must agree to the terms and opt-in for reminders to proceed.');
+                if (!agreeTerms) {
+                    toast.error('You must agree to the terms and conditions to proceed.');
                     return false;
                 }
                 return true;
@@ -435,11 +436,10 @@ export default function MultiStepForm() {
                                             return (
                                                 <li key={pkg.package_id} className="mx-auto w-full max-w-xs">
                                                     <div
-                                                        className={`group relative flex h-full cursor-pointer flex-col justify-between rounded-lg border bg-white p-2 text-center shadow-sm transition-all duration-200 md:p-2 ${
-                                                            selectedPackage === pkg.package_id
+                                                        className={`group relative flex h-full cursor-pointer flex-col justify-between rounded-lg border bg-white p-2 text-center shadow-sm transition-all duration-200 md:p-2 ${selectedPackage === pkg.package_id
                                                                 ? 'border-red-500 bg-red-50'
                                                                 : 'border-gray-200 hover:border-red-500 hover:shadow-md'
-                                                        } `}
+                                                            } `}
                                                         onClick={() => handlePackageClick(pkg.package_id)}
                                                     >
                                                         {/* Package Name */}
@@ -497,9 +497,8 @@ export default function MultiStepForm() {
                                                     <div
                                                         key={service.services_id}
                                                         onClick={() => handleServiceCheckboxChange(service.services_id)}
-                                                        className={`relative w-[230px] cursor-pointer overflow-hidden rounded-2xl border shadow-md transition-all hover:shadow-xl ${
-                                                            !isChecked ? 'opacity-50 grayscale' : ''
-                                                        }`}
+                                                        className={`relative w-[230px] cursor-pointer overflow-hidden rounded-2xl border shadow-md transition-all hover:shadow-xl ${!isChecked ? 'opacity-50 grayscale' : ''
+                                                            }`}
                                                     >
                                                         <div className="flex h-[230px] w-full items-center justify-center overflow-hidden bg-gray-100">
                                                             <img
@@ -534,7 +533,7 @@ export default function MultiStepForm() {
                         {activeStep === 1 && (
                             <div className="flex flex-col items-center">
                                 <CardTitle className="heading-3 mb-5 font-heading">Select Event Date & Time</CardTitle>
-                                <CardDescription>You should book your event a month before the event date!</CardDescription>
+                                <CardDescription>You should book your event three (3) months before the event date!</CardDescription>
                                 <div
                                     className={
                                         date
@@ -576,13 +575,6 @@ export default function MultiStepForm() {
                                                             (slot.to > t.from && slot.to <= t.to) ||
                                                             (slot.from <= t.from && slot.to >= t.to),
                                                     );
-
-                                                    // const appointment = appointmentTimes[dayKey]?.some(
-                                                    //     (t) =>
-                                                    //         (slot.from >= t.from && slot.from < t.to) ||
-                                                    //         (slot.to > t.from && slot.to <= t.to) ||
-                                                    //         (slot.from <= t.from && slot.to >= t.to),
-                                                    // );
 
                                                     return booked || blocked || servicebooked;
                                                 });
@@ -636,13 +628,7 @@ export default function MultiStepForm() {
                                                                             (slot.from <= t.from && slot.to >= t.to),
                                                                     ) ?? false;
 
-                                                                // const isAppointment =
-                                                                //     appointmentTimes[dateKey]?.some(
-                                                                //         (t) =>
-                                                                //             (slot.from >= t.from && slot.from < t.to) ||
-                                                                //             (slot.to > t.from && slot.to <= t.to) ||
-                                                                //             (slot.from <= t.from && slot.to >= t.to),
-                                                                //     ) ?? false;
+
 
                                                                 const isUnavailable = isBooked || isBlocked || isServiceBooked;
 
@@ -656,8 +642,8 @@ export default function MultiStepForm() {
                                                                             isUnavailable
                                                                                 ? 'ghost'
                                                                                 : selectedSlot === currentIdx
-                                                                                  ? 'brand2'
-                                                                                  : 'outline'
+                                                                                    ? 'brand2'
+                                                                                    : 'outline'
                                                                         }
                                                                         className={`w-full p-2 text-sm md:w-auto ${isUnavailable ? 'cursor-not-allowed text-gray-400 line-through' : ''} `}
                                                                         disabled={isUnavailable}
@@ -794,21 +780,6 @@ export default function MultiStepForm() {
                                             </div>
                                             <InputError message={errors.province} />
                                         </div>
-
-                                        {/* <div className="flex flex-col">
-                                        <div className="relative">
-                                            <GlobeIcon className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" size={16} />
-                                            <Textarea
-                                                id="others"
-                                                placeholder="Other Details"
-                                                value={data.others || ''}
-                                                onChange={(e) => setData('others', e.target.value)}
-                                                aria-invalid={!!errors.others}
-                                                className="pl-9"
-                                            />
-                                        </div>
-                                        <InputError message={errors.province} />
-                                    </div> */}
                                     </div>
                                 </div>
 
@@ -883,9 +854,9 @@ export default function MultiStepForm() {
                                                 <p className="text-base leading-relaxed font-medium text-gray-800">
                                                     {selectedServices.length > 0
                                                         ? relatedServices
-                                                              .filter((s) => selectedServices.includes(s.services_id))
-                                                              .map((s) => s.service_name)
-                                                              .join(', ')
+                                                            .filter((s) => selectedServices.includes(s.services_id))
+                                                            .map((s) => s.service_name)
+                                                            .join(', ')
                                                         : 'None'}
                                                 </p>
                                             </section>
@@ -947,70 +918,9 @@ export default function MultiStepForm() {
                                         </div>
                                     </div>
 
-                                    {/* Mobile Price Summary (collapsible) */}
+                                    {/* Mobile Price Summary */}
                                     <div className="mb-4 w-full md:hidden">
-                                        {(() => {
-                                            const selectedPackageId = selectedPackage ?? '';
-                                            const pkg = packages.find((pkg) => pkg.package_id === selectedPackageId);
-                                            const promoPercent = pkg?.package_promo || 0;
-                                            const originalPrice = pkg?.package_price || 0;
-                                            const discountedPrice =
-                                                pkg?.discounted_price ||
-                                                (promoPercent ? originalPrice - originalPrice * (promoPercent / 100) : originalPrice);
-
-                                            return (
-                                                <details className="rounded-xl border bg-white p-4">
-                                                    <summary className="font-medium">
-                                                        Price & Policy - ₱{Number(discountedPrice).toLocaleString('en-US')}
-                                                    </summary>
-                                                    <div className="mt-2 text-sm text-gray-700">
-                                                        <p>Total Amount Due: ₱{Number(discountedPrice).toLocaleString('en-US')}</p>
-                                                        <p className="mt-2">
-                                                            Tax & Fees Included. Cancellations or modifications can be made 24 hours before the event.
-                                                        </p>
-                                                    </div>
-                                                    {/* Agreement Options */}
-                                                    <div className="space-y-3">
-                                                        <div className="flex items-center gap-2">
-                                                            <Checkbox
-                                                                id="agree-terms"
-                                                                checked={agreeTerms}
-                                                                onCheckedChange={(checked) => setAgreeTerms(!!checked)}
-                                                            />
-                                                            <Label htmlFor="agree-terms" className="text-gray-700">
-                                                                I agree to the shop’s terms.
-                                                            </Label>
-                                                        </div>
-                                                        <div className="flex items-center gap-2">
-                                                            <Checkbox
-                                                                id="email-reminders"
-                                                                checked={emailReminders}
-                                                                onCheckedChange={(checked) => setEmailReminders(!!checked)}
-                                                            />
-                                                            <Label htmlFor="email-reminders" className="text-gray-700">
-                                                                Email me announcements and reminders.
-                                                            </Label>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Terms */}
-                                                    <div className="pt-4 text-sm leading-relaxed text-gray-500">
-                                                        By proceeding, you agree to our{' '}
-                                                        <TermsAndConditionsDialog
-                                                            trigger={
-                                                                <span className="cursor-pointer text-blue-500 underline">Terms & Conditions</span>
-                                                            }
-                                                        />{' '}
-                                                        .
-                                                    </div>
-                                                </details>
-                                            );
-                                        })()}
-                                    </div>
-
-                                    {/* Right: Price & Policy */}
-                                    <div className="hidden w-full space-y-6 md:block md:w-1/3">
-                                        <div className="rounded-xl border border-gray-200 bg-white p-8">
+                                        <div className="rounded-xl border border-gray-200 bg-white p-4">
                                             <h2 className="mb-4 text-xl font-semibold text-gray-800">💸 Price & Policy</h2>
 
                                             {/* Summary */}
@@ -1065,17 +975,79 @@ export default function MultiStepForm() {
                                                         onCheckedChange={(checked) => setAgreeTerms(!!checked)}
                                                     />
                                                     <Label htmlFor="agree-terms" className="text-gray-700">
-                                                        I agree to the shop’s terms.
+                                                        I agree to the shop’s terms and conditions.
                                                     </Label>
                                                 </div>
+                                            </div>
+
+                                            {/* Terms */}
+                                            <div className="pt-4 text-sm leading-relaxed text-gray-500">
+                                                By proceeding, you agree to our{' '}
+                                                <TermsAndConditionsDialog
+                                                    trigger={<span className="cursor-pointer text-blue-500 underline">Terms & Conditions</span>}
+                                                />{' '}
+                                                .
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Right: Price & Policy */}
+                                    <div className="hidden w-full space-y-6 md:block md:w-1/3">
+                                        <div className="rounded-xl border border-gray-200 bg-white p-8">
+                                            <h2 className="mb-4 text-xl font-semibold text-gray-800">💸 Price & Policy</h2>
+
+                                            {/* Summary */}
+                                            <p className="mb-3 text-gray-600">1 Package / {selectedServices.length} Services</p>
+
+                                            {/* Price Breakdown */}
+                                            {(() => {
+                                                const selectedPackageId = selectedPackage ?? '';
+                                                const pkg = packages.find((pkg) => pkg.package_id === selectedPackageId);
+                                                const promoPercent = pkg?.package_promo || 0;
+                                                const originalPrice = pkg?.package_price || 0;
+                                                const discountedPrice = pkg?.discounted_price || originalPrice;
+
+                                                return (
+                                                    <div className="space-y-1 text-gray-800">
+                                                        {promoPercent > 0 ? (
+                                                            <>
+                                                                <p>Original Price: ₱{originalPrice.toLocaleString()}</p>
+                                                                <p>
+                                                                    Discount ({promoPercent}%): -₱
+                                                                    {Number(originalPrice - discountedPrice).toLocaleString('en-US')}
+                                                                </p>
+                                                                <p className="mt-2 text-lg font-semibold text-green-700">
+                                                                    Total Amount Due: ₱{Number(discountedPrice).toLocaleString('en-US')}
+                                                                </p>
+                                                            </>
+                                                        ) : (
+                                                            <p className="text-lg font-semibold text-green-700">
+                                                                Total Amount Due: ₱{Number(discountedPrice).toLocaleString('en-US')}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
+
+                                            <div className="my-6 border-t border-gray-100" />
+
+                                            {/* Policy Note */}
+                                            <p className="text-sm leading-relaxed text-gray-500">
+                                                Tax & Fees Included. All bookings are final and cannot be canceled or modified. All bookings must be confirmed.
+                                            </p>
+
+                                            <div className="my-6 border-t border-gray-100" />
+
+                                            {/* Agreement Options */}
+                                            <div className="space-y-3">
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
-                                                        id="email-reminders"
-                                                        checked={emailReminders}
-                                                        onCheckedChange={(checked) => setEmailReminders(!!checked)}
+                                                        id="agree-terms"
+                                                        checked={agreeTerms}
+                                                        onCheckedChange={(checked) => setAgreeTerms(!!checked)}
                                                     />
-                                                    <Label htmlFor="email-reminders" className="text-gray-700">
-                                                        Email me announcements and reminders.
+                                                    <Label htmlFor="agree-terms" className="text-gray-700">
+                                                        I agree to the shop’s terms and conditions.
                                                     </Label>
                                                 </div>
                                             </div>
@@ -1102,9 +1074,8 @@ export default function MultiStepForm() {
 
                                     {/* Dynamic Layout */}
                                     <div
-                                        className={`mt-6 w-full ${
-                                            paymentMethod === '2' ? 'grid grid-cols-1 gap-6 md:grid-cols-2' : 'flex justify-center'
-                                        }`}
+                                        className={`mt-6 w-full ${paymentMethod === '2' ? 'grid grid-cols-1 gap-6 md:grid-cols-2' : 'flex justify-center'
+                                            }`}
                                     >
                                         {/* Column 1: Payment Method + Summary */}
                                         <div className="space-y-2">
@@ -1225,9 +1196,7 @@ export default function MultiStepForm() {
                                                                         </CardDescription>
                                                                         <CardDescription>
                                                                             Discount ({promoPercent}%): -₱
-                                                                            {Number(originalPrice - calculatedDiscountedPrice).toLocaleString(
-                                                                                'en-US',
-                                                                            )}
+                                                                            {Number(originalPrice - calculatedDiscountedPrice).toLocaleString('en-US')}
                                                                         </CardDescription>
                                                                         <hr />
                                                                         <CardHeader>
@@ -1244,6 +1213,8 @@ export default function MultiStepForm() {
                                                                             </span>
                                                                             <CardDescription>
                                                                                 Please pay the down payment to confirm your booking.
+                                                                                <br />
+                                                                                <b>If you cannot afford the 50%, a minimum of ₱15,000 down payment is accepted.</b>
                                                                             </CardDescription>
                                                                         </CardHeader>
                                                                     </>
@@ -1272,13 +1243,13 @@ export default function MultiStepForm() {
                                                                     </>
                                                                 )}
                                                             </div>
+
                                                         );
                                                     })()}
                                                 </CardContent>
                                             </Card>
                                         </div>
 
-                                        {/* Column 2: GCash Payment (only show if selected) */}
                                         {paymentMethod === '2' && (
                                             <div className="mt-2 grid grid-cols-1 gap-3 lg:grid-cols-2">
                                                 <div>
@@ -1286,7 +1257,7 @@ export default function MultiStepForm() {
                                                     <CardDescription>Scan the QR code below to pay using GCash.</CardDescription>
 
                                                     <img
-                                                        src="http://localhost:8000/storage/Gcash-BMA-QRcode.jpg"
+                                                        src="/storage/Gcash-BMA-QRcode.jpg"
                                                         alt="Payment QR Code"
                                                         loading="lazy"
                                                         className="mt-4 w-full object-contain"
@@ -1426,12 +1397,11 @@ export default function MultiStepForm() {
 
                                                             <DialogHeader className="mt-12 flex flex-col items-center justify-center gap-3 text-center">
                                                                 <DialogTitle className="text-2xl font-semibold text-emerald-500">
-                                                                    Booking Submitted!
+                                                                    Verify Email
                                                                 </DialogTitle>
 
-                                                                <strong className="text-gray-700">Verify Email</strong>
-                                                                <p className="text-gray-600">{bookingData?.booking?.contact_email}</p>
-
+                                                                <strong className="text-gray-700">Email sent to:</strong>
+                                                                <p className="text-gray-600">{data.email}</p>
                                                                 <DialogDescription className="mb-4 text-center text-gray-500">
                                                                     We've sent a verification email to the address you provided.
                                                                     <br />

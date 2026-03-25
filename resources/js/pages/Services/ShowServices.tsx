@@ -36,14 +36,12 @@ function confirmDelete(packageId: string, serviceId: string) {
 export default function ShowServices(props: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
 
-    // form state for ADD
     const { data, setData, post, processing, errors, reset } = useForm({
         service_name: '',
         description: '',
         image: null as File | null,
     });
 
-    // form state for EDIT
     const {
         data: editData,
         setData: setEditData,
@@ -85,10 +83,9 @@ export default function ShowServices(props: Props) {
         formData.append('service_name', editData.service_name);
         formData.append('description', editData.description);
         if (editData.image) {
-            formData.append('image', editData.image); // only append if changed
+            formData.append('image', editData.image);
         }
 
-        // for PUT method simulation
         formData.append('_method', 'PUT');
 
         router.post(route('package.services.update', editingService.services_id), formData, {
@@ -96,7 +93,6 @@ export default function ShowServices(props: Props) {
             onSuccess: () => {
                 resetEdit();
                 setEditingService(null);
-                toast.success('Service updated successfully');
             },
             onError: (errors) => {
                 console.log(errors);
@@ -141,7 +137,6 @@ export default function ShowServices(props: Props) {
                                     <div>
                                         <Label htmlFor="description">Description</Label>
                                         <Input
-                                            required
                                             id="description"
                                             name="description"
                                             value={data.description}
@@ -231,7 +226,6 @@ export default function ShowServices(props: Props) {
                                                     <div>
                                                         <Label htmlFor="edit_description">Description</Label>
                                                         <Input
-                                                            required
                                                             id="edit_description"
                                                             name="description"
                                                             value={editData.description}

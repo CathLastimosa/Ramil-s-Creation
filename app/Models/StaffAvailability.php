@@ -21,7 +21,6 @@ class StaffAvailability extends Model
         'reason',
     ];
 
-    // Each availability record belongs to one staff member
     public function staff()
     {
         return $this->belongsTo(Staff::class, 'staff_id', 'staff_id');

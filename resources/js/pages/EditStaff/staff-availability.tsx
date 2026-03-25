@@ -65,7 +65,6 @@ export default function EditStaffAvailability({ staff }: Props) {
     };
     const timeOptions = generateTimeOptions();
 
-    // Initialize availability from staff data
     useEffect(() => {
         const initialAvailability: Record<string, { start_time?: string; end_time?: string; status: 'available' | 'blocked' }> = {};
         const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -78,20 +77,17 @@ export default function EditStaffAvailability({ staff }: Props) {
                     initialAvailability[day] = { status: 'blocked' };
                     blockedSet.add(day);
                 } else {
-                    // Convert 24-hour to 12-hour for display
                     const startTime = avail.start_time ? convertTo12Hour(avail.start_time) : DEFAULT_START;
                     const endTime = avail.end_time ? convertTo12Hour(avail.end_time) : DEFAULT_END;
                     initialAvailability[day] = { start_time: startTime, end_time: endTime, status: 'available' };
                 }
             } else {
-                // Default if no availability set
                 initialAvailability[day] = { start_time: DEFAULT_START, end_time: DEFAULT_END, status: 'available' };
             }
         });
 
         setData('availability', initialAvailability);
         setBlockedDays(blockedSet);
-        // Check if all days are default business hours
         const allDefault = days.every(day => {
             const avail = initialAvailability[day];
             return avail.status === 'available' && avail.start_time === DEFAULT_START && avail.end_time === DEFAULT_END;
@@ -200,7 +196,6 @@ export default function EditStaffAvailability({ staff }: Props) {
                             <p className="text-xs text-muted-foreground">Set the days and times this staff member is available.</p>
                         </div>
 
-                        {/* Use Business Hours Switch */}
                         <div className="flex items-center justify-between">
                             <div className="space-y-0.5">
                                 <Label htmlFor="business-hours" className="text-sm leading-none font-medium">
@@ -216,7 +211,6 @@ export default function EditStaffAvailability({ staff }: Props) {
                             />
                         </div>
 
-                        {/* Weekly Schedule */}
                         <div
                             className={`space-y-2 transition-opacity duration-200 ${
                                 useBusinessHours ? 'pointer-events-none opacity-50' : ''

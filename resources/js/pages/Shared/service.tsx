@@ -77,7 +77,6 @@ export default function Service({
         if (flash.error) toast.error(flash.error);
     }, [flash.success, flash.error]);
 
-    // 🔍 Search debounce
     const handleSearch = useRef(
         debounce((query: string) => {
             router.get(route('sharedservice.index'), { search: query }, { preserveState: true, replace: true });
@@ -86,7 +85,6 @@ export default function Service({
 
     const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value);
 
-    // Map all service bookings and associate assigned staff for each
     const mappedServiceBookings = (serviceBookings || []).map((serviceBooking) => ({
         serviceBooking,
         assignedStaff: assignedServiceStaff.filter((assigned) => assigned.service_booking_id === serviceBooking.service_booking_id),
@@ -107,7 +105,6 @@ export default function Service({
                     <CardDescription>View service bookings and their assigned staff. You can manage staff assignments here.</CardDescription>
 
                     <div className="flex items-center justify-between">
-                        {/* 🔍 Search Bar */}
                         <div className="relative w-full sm:w-1/3">
                             <Input id="search" className="peer ps-9" placeholder="Search Bookings or Staff" type="search" onChange={onSearchChange} />
                             <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3 text-muted-foreground/80">
@@ -136,7 +133,6 @@ export default function Service({
     );
 }
 
-/* Service Booking Accordion Component */
 function ServiceBookingAccordion({
     serviceBookings,
     staff,

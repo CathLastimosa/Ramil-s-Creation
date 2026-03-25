@@ -23,7 +23,7 @@ export function NavUser() {
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
-                        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-2xl border border-gray-100 bg-white shadow-xl"
+                        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-2xl border border-gray-100 bg-white shadow-xl dark:border-muted dark:bg-muted"
                         align="end"
                         side={isMobile ? 'bottom' : state === 'collapsed' ? 'left' : 'bottom'}
                     >

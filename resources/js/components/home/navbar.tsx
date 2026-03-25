@@ -1,7 +1,7 @@
 import { Link } from '@inertiajs/react';
 import React, { useEffect, useRef, useState } from 'react';
 
-const Navbar: React.ComponentType<{ packages: any[] }> = ({ packages }) => {
+const Navbar: React.ComponentType<{ packages: any[]; promo?: number }> = ({ packages, promo }) => {
     useEffect(() => {
         console.log('Packages in Navbar:', packages);
     }, [packages]);
@@ -18,7 +18,7 @@ const Navbar: React.ComponentType<{ packages: any[] }> = ({ packages }) => {
     const scrollToSection = (id: string) => {
         const section = document.querySelector(id);
         if (section) {
-            const yOffset = showNews ? -128 : -70; // Adjust for navbar height + news height
+            const yOffset = showNews && hasPromo ? -136 : -70; // Adjust for navbar height + news height
             const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
             window.scrollTo({ top: y, behavior: 'smooth' });
         } else {
@@ -85,8 +85,10 @@ const Navbar: React.ComponentType<{ packages: any[] }> = ({ packages }) => {
 
     const isDropdownOpen = (dropdownName: string) => openDropdown === dropdownName;
 
+    const hasPromo = promo && promo > 0;
+
     return (
-        <nav ref={dropdownRef} className={`fixed ${showNews ? 'top-7' : 'top-0'} right-0 left-0 z-50 bg-white shadow-lg`}>
+        <nav ref={dropdownRef} className={`fixed ${showNews && hasPromo ? 'top-7' : 'top-0'} right-0 left-0 z-50 bg-white shadow-lg`}>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-4">
                 <div className="flex h-16 items-center justify-between font-heading">
                     {/* Left: Logo */}

@@ -77,10 +77,10 @@ export function AppointmentStatusRadialChart({ appointmentStatuses }: Appointmen
                                         const { cx, cy } = viewBox as { cx: number; cy: number };
                                         return (
                                             <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle">
-                                                <tspan x={cx} y={cy - 10} className="text-3xl font-bold text-red-950 dark:text-red-300">
+                                                <tspan x={cx} y={cy - 10} className="fill-red-950 text-3xl font-bold dark:fill-white">
                                                     {totalAppointments.toLocaleString()}
                                                 </tspan>
-                                                <tspan x={cx} y={cy + 16} className="fill-muted-foreground">
+                                                <tspan x={cx} y={cy + 16} className="fill-muted-foreground dark:fill-white">
                                                     Visitors
                                                 </tspan>
                                             </text>

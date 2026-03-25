@@ -59,7 +59,7 @@ class ServicesController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $contents = file_get_contents($file->getRealPath());
-            $mime = $file->getClientMimeType(); // e.g. image/png
+            $mime = $file->getClientMimeType(); 
             $validated['image'] = 'data:'.$mime.';base64,'.base64_encode($contents);
         }
 

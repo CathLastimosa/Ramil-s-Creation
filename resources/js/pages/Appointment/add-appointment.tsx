@@ -103,7 +103,6 @@ export default function AppointmentForm({ appointmentTimes, blockedtimes }: Page
         <div className="mx-auto w-full max-w-5xl">
             <Toaster richColors position="top-center" />
             <form id="appointmentForm" onSubmit={handleSubmit} className="space-y-8">
-                {/* Step 0: Purpose */}
                 <section className="w-full space-y-4">
                     <div className="space-y-2">
                         <h2 className="text-l font-semibold">Purpose of Appointment</h2>
@@ -163,7 +162,6 @@ export default function AppointmentForm({ appointmentTimes, blockedtimes }: Page
 
                 <hr className="border-gray-200" />
 
-                {/* Step 1: Date & Time */}
                 <section className="w-full space-y-6">
                     <div className="space-y-2">
                         <h2 className="text-l font-semibold">Select Appointment Date & Time</h2>
@@ -253,7 +251,6 @@ export default function AppointmentForm({ appointmentTimes, blockedtimes }: Page
 
                 <hr className="border-gray-200" />
 
-                {/* Step 2: Booking Info */}
                 <section className="w-full space-y-4">
                     <div className="space-y-2">
                         <h2 className="text-l font-semibold">Contact Information</h2>
@@ -301,7 +298,6 @@ export default function AppointmentForm({ appointmentTimes, blockedtimes }: Page
 
                 <hr className="border-gray-200" />
 
-                {/* Submit Button */}
                 <div className="flex justify-end items-center gap-2">
                     <Button type="button" variant="secondary" onClick={() => window.history.back()}>
                         Cancel

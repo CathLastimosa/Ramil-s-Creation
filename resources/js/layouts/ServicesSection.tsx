@@ -98,8 +98,8 @@ const ServicesSection = () => {
                     </div>
 
                     <div className="body-medium w-full py-10 font-heading sm:flex-row sm:space-x-4">
-                        <ButtonPrimary onClick={() => scrollToSection('#packages')} className="w-full sm:mb-0 sm:w-auto">
-                            Explore Packages
+                        <ButtonPrimary href="/appointment" className="w-full sm:mb-0 sm:w-auto">
+                            Schedule a Visit
                         </ButtonPrimary>
                     </div>
                 </motion.div>

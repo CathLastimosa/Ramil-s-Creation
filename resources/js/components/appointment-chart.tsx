@@ -15,7 +15,7 @@ interface AppointmentChartProps {
 }
 
 export default function AppointmentChart({ appointmentsData, period }: AppointmentChartProps) {
-    const total = useMemo(() => appointmentsData.reduce((sum, item) => sum + item.value, 0), [appointmentsData]);
+    const total = useMemo(() => appointmentsData.reduce((sum, item) => sum + item.value, 0), [appointmentsData]); // Calculate total appointments
 
     const color = 'var(--color-accent2)';
     const gradientId = 'appointmentsGradient';
@@ -57,9 +57,15 @@ export default function AppointmentChart({ appointmentsData, period }: Appointme
                                 content={({ active, payload }) => {
                                     if (active && payload && payload.length) {
                                         const value = payload[0].value as number;
+                                        const date = payload[0].payload.date;
+                                        const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                                            month: 'short',
+                                            day: 'numeric',
+                                            year: 'numeric',
+                                        });
                                         return (
-                                            <div className="pointer-events-none rounded-lg border border-border bg-background/95 p-2 shadow-lg backdrop-blur-sm">
-                                                <p className="text-sm text-foreground">{value} appointments</p>
+                                            <div className="pointer-events-none rounded-lg border border-border bg-background/95 p-1 shadow-lg backdrop-blur-sm">
+                                                <p className="text-xs text-foreground">{formattedDate}: {value} appointments</p>
                                             </div>
                                         );
                                     }
@@ -68,7 +74,7 @@ export default function AppointmentChart({ appointmentsData, period }: Appointme
                             />
 
                             <Area
-                                type="monotone"
+                                type="monotone" // Smooth curve
                                 dataKey="value"
                                 stroke={color}
                                 fill={`url(#${gradientId})`}

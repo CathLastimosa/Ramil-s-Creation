@@ -25,7 +25,7 @@ export default function EditPackage() {
         packageName: packageData.package_name || '',
         packageDescription: packageData.package_description || '',
         packagePrice: packageData.package_price || '',
-        packagePromo: packageData.package_promo || '',
+        packagePromo: packageData.package_promo || 0,
         discountedPrice: packageData.discounted_price || '',
         packageStatus: packageData.status || '',
         services: packageData.services || [],
@@ -94,7 +94,7 @@ export default function EditPackage() {
                                     id="packagePromo"
                                     type="number"
                                     value={data.packagePromo}
-                                    onChange={(e) => setData('packagePromo', e.target.value)}
+                                    onChange={(e) => setData('packagePromo', e.target.value === '' ? 0 : Number(e.target.value))}
                                     placeholder="0"
                                 />
                                 <InputError className="mt-2" message={errors.packagePromo} />
@@ -138,8 +138,6 @@ export default function EditPackage() {
                         </div>
                     </form>
                 </div>
-
-                {/* <ShowServices services={data.services} package={packageData} /> */}
             </EditPackageLayout>
         </AppLayout>
     );

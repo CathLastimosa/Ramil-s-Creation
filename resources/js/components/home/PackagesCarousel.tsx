@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface PackageImage {
     src: string;
@@ -34,29 +34,24 @@ const PackagesCarousel: React.FC<PackagesCarouselProps> = ({ packages, onSlideCh
     const prevPackage = packages[getPrevIndex(currentIndex)];
 
     return (
-        <div className="relative w-full max-w-7xl mx-auto">
+        <div className="relative mx-auto w-full max-w-7xl">
             {/* Arrows */}
-            <div className="
-                absolute z-20 flex space-x-2
-                lg:-top-13 lg:right-4 
-                bottom-4 left-1/2 -translate-x-1/2
-                lg:bottom-auto lg:left-auto lg:translate-x-0
-            ">
+            <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 space-x-2 lg:-top-13 lg:right-4 lg:bottom-auto lg:left-auto lg:translate-x-0">
                 <button
                     onClick={prevSlide}
-                    className="w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-lg transition-all duration-300 hover:scale-110 hover:bg-white"
                     aria-label="Previous package"
                 >
-                    <svg className="w-5 h-5 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-5 w-5 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>
                 <button
                     onClick={nextSlide}
-                    className="w-10 h-10 bg-red-800 hover:bg-red-700 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-red-800 shadow-lg transition-all duration-300 hover:scale-110 hover:bg-red-700"
                     aria-label="Next package"
                 >
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                 </button>
@@ -65,25 +60,21 @@ const PackagesCarousel: React.FC<PackagesCarouselProps> = ({ packages, onSlideCh
             {/* Carousel Container */}
             <div className="relative flex items-center justify-between space-x-6">
                 {/* Previous Image (Small) */}
-                <div className="hidden lg:block w-1/3 transition-all duration-500 ease-in-out">
+                <div className="hidden w-1/3 transition-all duration-500 ease-in-out lg:block">
                     <div className="relative overflow-hidden shadow-xl">
                         <img
                             src={prevPackage.src}
                             alt={prevPackage.alt}
-                            className="w-full h-75 object-cover opacity-80 hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+                            className="h-75 w-full cursor-pointer object-cover opacity-80 transition-opacity duration-300 hover:opacity-100"
                             onClick={prevSlide}
                         />
                     </div>
                 </div>
 
                 {/* Current Image (Large) */}
-                <div className="w-full lg:w-5xl transition-all duration-500 ease-in-out">
+                <div className="w-full transition-all duration-500 ease-in-out lg:w-5xl">
                     <div className="relative overflow-hidden shadow-2xl">
-                        <img
-                            src={currentPackage.src}
-                            alt={currentPackage.alt}
-                            className="w-full h-80 sm:h-96 md:h-110 object-cover"
-                        />
+                        <img src={currentPackage.src} alt={currentPackage.alt} className="h-80 w-full object-cover sm:h-96 md:h-110" />
                     </div>
                 </div>
             </div>

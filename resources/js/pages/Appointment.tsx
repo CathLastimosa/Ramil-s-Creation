@@ -37,8 +37,14 @@ interface AppointmentTime {
     status: string;
 }
 
+interface BlockedTime {
+    from: string;
+    to: string;
+}
+
 interface PageProps extends InertiaPageProps {
     // bookedTimes: Record<string, BookingTime[]>;
+    blockedtimes: Record<string, BlockedTime[]>;
     appointmentTimes: Record<string, AppointmentTime[]>;
 }
 
@@ -102,7 +108,7 @@ export default function MultiStepForm() {
         }
     }, []);
 
-    const { bookedTimes = {}, appointmentTimes = {} } = usePage<PageProps>().props;
+    const { bookedTimes = {}, blockedtimes = {}, appointmentTimes = {} } = usePage<PageProps>().props;
     const [activeStep, setActiveStep] = useState(0);
     const [step, setStep] = useState<'confirm' | 'recaptcha' | 'verify' | 'success'>('confirm');
     const [date, setDate] = useState<Date | undefined>(undefined);
@@ -126,11 +132,11 @@ export default function MultiStepForm() {
     // Appointment slots
     const appointmentSlots = [
         { from: '07:00', to: '09:00' },
-        { from: '09:10', to: '11:00' },
-        { from: '13:00', to: '15:00' },
-        { from: '15:10', to: '18:00' },
+        { from: '09:00', to: '11:00' },
+        { from: '11:00', to: '13:00' },
+        { from: '13:10', to: '16:00' },
+        { from: '16:10', to: '18:00' },
         { from: '18:10', to: '20:00' },
-        { from: '20:10', to: '22:00' },
     ];
 
     const formatTo12Hour = (time24: string) => {
@@ -187,8 +193,8 @@ export default function MultiStepForm() {
     };
 
     const validatePhone = (phone: string): boolean => {
-        const digits = phone.replace(/\D/g, '');
-        return digits.length >= 10;
+        const phoneRegex = /^09\d{9}$/;
+        return phoneRegex.test(phone);
     };
 
     const validateStep = (step: number): boolean => {
@@ -207,7 +213,6 @@ export default function MultiStepForm() {
     };
 
     const id = useId();
-    // Responsive Stepper orientation and container sizing
     const theme = useTheme();
     const isSm = useMediaQuery(theme.breakpoints.down('sm'));
     const stepperOrientation = isSm ? 'vertical' : 'horizontal';
@@ -252,14 +257,13 @@ export default function MultiStepForm() {
                                 </div>
                                 <div className="mt-10 grid grid-cols-1 gap-3 md:grid-cols-7">
                                     <div className="flex flex-wrap justify-center gap-3 md:col-span-7">
-                                        {['Rent', 'Gown', 'Suit', 'Make-Up', 'Catering', 'Inquire', 'Follow-ups'].map((purpose) => (
+                                        {['Rent', 'Gown', 'Suit', 'Make-Up', 'Catering', 'Inquire', 'Hairstyle'].map((purpose) => (
                                             <Shadcn
                                                 key={purpose}
                                                 className="w-auto"
                                                 type="button"
                                                 variant="outline"
                                                 onClick={() => {
-                                                    // Check if the string already exists
                                                     if (!data.purposeTags.includes(purpose)) {
                                                         setData('purposeTags', [...data.purposeTags, purpose]);
                                                     }
@@ -278,7 +282,6 @@ export default function MultiStepForm() {
                                                 type="button"
                                                 variant="outline"
                                                 onClick={() => {
-                                                    // Check if the string already exists
                                                     if (!data.purposeTags.includes(purpose)) {
                                                         setData('purposeTags', [...data.purposeTags, purpose]);
                                                     }
@@ -318,13 +321,6 @@ export default function MultiStepForm() {
                                                 const dayKey = formatLocalDate(day);
 
                                                 const fullyBooked = appointmentSlots.every((slot) => {
-                                                    // const booked = bookedTimes[dayKey]?.some(
-                                                    //     (t) =>
-                                                    //         (slot.from >= t.from && slot.from < t.to) ||
-                                                    //         (slot.to > t.from && slot.to <= t.to) ||
-                                                    //         (slot.from <= t.from && slot.to >= t.to),
-                                                    // );
-
                                                     const appointment = appointmentTimes[dayKey]?.some(
                                                         (t) =>
                                                             (slot.from >= t.from && slot.from < t.to) ||
@@ -332,7 +328,14 @@ export default function MultiStepForm() {
                                                             (slot.from <= t.from && slot.to >= t.to),
                                                     );
 
-                                                    return appointment;
+                                                    const blocked = blockedtimes[dayKey]?.some(
+                                                        (t) =>
+                                                            (slot.from >= t.from && slot.from < t.to) ||
+                                                            (slot.to > t.from && slot.to <= t.to) ||
+                                                            (slot.from <= t.from && slot.to >= t.to),
+                                                    );
+
+                                                    return blocked || appointment;
                                                 });
 
                                                 return fullyBooked;
@@ -346,13 +349,6 @@ export default function MultiStepForm() {
                                             <div className="mt-2 grid grid-cols-1 gap-2">
                                                 {appointmentSlots.map((slot, idx) => {
                                                     const dateKey = formatLocalDate(date!);
-                                                    // const isBooked =
-                                                    //     bookedTimes[dateKey]?.some(
-                                                    //         (t) =>
-                                                    //             (slot.from >= t.from && slot.from < t.to) ||
-                                                    //             (slot.to > t.from && slot.to <= t.to) ||
-                                                    //             (slot.from <= t.from && slot.to >= t.to),
-                                                    //     ) ?? false;
 
                                                     const isAppointment =
                                                         appointmentTimes[dateKey]?.some(
@@ -362,15 +358,26 @@ export default function MultiStepForm() {
                                                                 (slot.from <= t.from && slot.to >= t.to),
                                                         ) ?? false;
 
+                                                    const isBlocked =
+                                                        blockedtimes[dateKey]?.some(
+                                                            (t) =>
+                                                                (slot.from >= t.from && slot.from < t.to) ||
+                                                                (slot.to > t.from && slot.to <= t.to) ||
+                                                                (slot.from <= t.from && slot.to >= t.to),
+                                                        ) ?? false;
+
+                                                    const isUnavailable = isAppointment || isBlocked;
+
+                                                    const currentIdx = idx;
                                                     return (
                                                         <Shadcn
                                                             key={idx}
                                                             type="button"
-                                                            variant={isAppointment ? 'ghost' : selectedSlot === idx ? 'brand2' : 'outline'}
-                                                            className={`${isAppointment ? 'cursor-not-allowed text-gray-400 line-through' : 'cursor-pointer'}`}
-                                                            disabled={isAppointment}
+                                                            variant={isUnavailable ? 'ghost' : selectedSlot === idx ? 'brand2' : 'outline'}
+                                                            className={`${isUnavailable ? 'cursor-not-allowed text-gray-400 line-through' : 'cursor-pointer'}`}
+                                                            disabled={isUnavailable}
                                                             onClick={() => {
-                                                                if (!isAppointment) {
+                                                                if (!isUnavailable) {
                                                                     setSelectedSlot(idx);
                                                                 }
                                                             }}

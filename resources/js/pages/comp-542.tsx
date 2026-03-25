@@ -7,9 +7,21 @@ import { useMemo, useState } from 'react';
 import type { CalendarEvent } from '../components/types';
 
 export default function Component() {
-    const { bookingEvents, appointmentEvents, blockedDates, serviceBookings } = usePage().props;
+    const {
+        bookingEvents,
+        appointmentEvents,
+        blockedDates,
+        serviceBookings,
+        bookedTimes,
+        blockedtimes: blockedTimesFromProps,
+        servicebookingtimes,
+        appointmentTimes: appointmentTimesFromProps,
+    } = usePage().props;
 
     const appointmentTimes = useMemo(() => {
+        if (appointmentTimesFromProps) {
+            return appointmentTimesFromProps as Record<string, { from: string; to: string; status: string }[]>;
+        }
         const times: Record<string, { from: string; to: string; status: string }[]> = {};
         Object.entries(appointmentEvents || {}).forEach(([dateKey, appts]) => {
             times[dateKey] = (appts as any[]).map((appt: any) => ({
@@ -19,9 +31,12 @@ export default function Component() {
             }));
         });
         return times;
-    }, [appointmentEvents]);
+    }, [appointmentEvents, appointmentTimesFromProps]);
 
     const blockedtimes = useMemo(() => {
+        if (blockedTimesFromProps) {
+            return blockedTimesFromProps as Record<string, { from: string; to: string }[]>;
+        }
         const times: Record<string, { from: string; to: string }[]> = {};
         Object.entries(blockedDates || {}).forEach(([dateKey, blocks]) => {
             times[dateKey] = (blocks as any[]).map((blk: any) => ({
@@ -30,7 +45,7 @@ export default function Component() {
             }));
         });
         return times;
-    }, [blockedDates]);
+    }, [blockedDates, blockedTimesFromProps]);
     const initialEvents = useMemo<CalendarEvent[]>(() => {
         const allEvents: CalendarEvent[] = [];
 
@@ -557,6 +572,8 @@ Paid: ₱${service.paid_amount || 'N/A'}`.trim(),
                     onEventDelete={handleEventDelete}
                     appointmentTimes={appointmentTimes}
                     blockedtimes={blockedtimes}
+                    bookedTimes={bookedTimes as Record<string, { from: string; to: string; status: string }[]>}
+                    servicebookingtimes={servicebookingtimes as Record<string, { from: string; to: string }[]>}
                 />
             </div>
         </AppLayout>

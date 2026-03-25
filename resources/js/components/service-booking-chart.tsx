@@ -56,10 +56,15 @@ export default function ServiceBookingChart({ serviceBookingsData, period }: Ser
                                 cursor={{ stroke: color, strokeWidth: 1, strokeDasharray: '2 2' }}
                                 content={({ active, payload }) => {
                                     if (active && payload && payload.length) {
-                                        const value = payload[0].value as number;
+                                        const { date, value } = payload[0].payload as ServiceBookingData;
+                                        const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                                            month: 'short',
+                                            day: 'numeric',
+                                            year: 'numeric',
+                                        });
                                         return (
-                                            <div className="pointer-events-none rounded-lg border border-border bg-background/95 p-2 shadow-lg backdrop-blur-sm">
-                                                <p className="text-sm font-semibold text-foreground">{value} service bookings</p>
+                                            <div className="pointer-events-none rounded-lg border border-border bg-background/95 p-1 shadow-lg backdrop-blur-sm">
+                                                <p className="text-xs text-foreground">{formattedDate}: {value} service bookings</p>
                                             </div>
                                         );
                                     }
@@ -69,7 +74,7 @@ export default function ServiceBookingChart({ serviceBookingsData, period }: Ser
 
                             <Area
                                 type="monotone"
-                                dataKey="value"
+                                dataKey="value" 
                                 stroke={color}
                                 fill={`url(#${gradientId})`}
                                 strokeWidth={2}

@@ -11,14 +11,13 @@ import React, { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Services', href: '/service' },
-  { title: 'Edit Service', href: '#' }, // dynamic later
+  { title: 'Edit Service', href: '#' }, 
 ];
 
 export default function EditService() {
   const page = usePage<{ service: any }>();
   const serviceData = page.props.service || {};
 
-  // Separate file input from image preview URL
   const [imagePreview, setImagePreview] = useState<string | null>(serviceData.image || null);
 
   const { data, setData, put, processing, errors } = useForm({

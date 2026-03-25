@@ -14,9 +14,8 @@ import { useEffect } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Packages', href: '/package' },
-  { title: 'View Services', href: '#' } // dynamic title later
+  { title: 'View Services', href: '#' } 
 ];
-// Define types for the package and service objects
 interface Service {
   services_id: string;
   service_name: string;
@@ -28,7 +27,6 @@ interface Package {
   package_id: string;
   package_name: string;
   package_description: string;
-  // add other fields if needed
 }
 
 interface Props {

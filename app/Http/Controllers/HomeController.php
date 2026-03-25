@@ -286,7 +286,7 @@ class HomeController extends Controller
             'bookedTimes' => $bookedTimes,
             'blockedtimes' => $blockedtimes,
             'servicebookingtimes' => $servicebookingtimes,
-            
+
             // 'appointmentTimes' => $appointmentTimes,
             'packages' => $packages,
             'promo' => $promo,
@@ -306,7 +306,5 @@ class HomeController extends Controller
             'packages' => $packages,
             'promo' => $promo,
         ]);
-   
     }
-
 }

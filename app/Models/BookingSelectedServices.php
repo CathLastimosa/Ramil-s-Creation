@@ -2,19 +2,26 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Model;
 
-class BookingSelectedServices extends Pivot
+class BookingSelectedServices extends Model
 {
     protected $table = 'booking_selected_services';
-    protected $primaryKey = 'booking_selected_service_id'; 
-    public $incrementing = false; 
-    protected $keyType = 'string';
+    protected $primaryKey = 'booking_selected_service_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
     protected $fillable = [
-        'booking_selected_service_id',
         'booking_id',
         'services_id',
         'package_id',
+        'package_name',
+        'package_description',
+        'package_price',
+        'package_promo',
+        'discounted_price',
+        'service_name',
+        'service_description',
+        'service_image',
     ];
 
     public function booking()

@@ -30,11 +30,7 @@ const HeroSection: React.FC<HeroSectionProps & { packages: any[] }> = ({ package
         <>
             {showNews && <News promo={promo} />}
             <div id="hero" className="relative min-h-screen overflow-hidden bg-white lg:mb-24">
-                {/* Navigation */}
-                <Navbar packages={packages} />
-
-                {/* Main Content */}
-                {/* Hero Section */}
+                <Navbar packages={packages} promo={promo} />
                 <div className="relative flex min-h-screen items-center pt-16 lg:pt-0">
                     <div className="mx-auto w-full max-w-7xl px-6 py-20 sm:px-6 lg:px-8 lg:py-40">
                         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">

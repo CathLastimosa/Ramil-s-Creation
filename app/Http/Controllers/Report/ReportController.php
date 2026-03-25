@@ -17,7 +17,6 @@ class ReportController extends Controller
     {
         $query = Bookings::withTrashed()->where('status', 'completed');
 
-        // Apply filters
         if ($request->has('date') && $request->date) {
             $query->whereDate('event_date', $request->date);
         }
@@ -28,25 +27,25 @@ class ReportController extends Controller
             $query->whereYear('event_date', $request->year);
         }
         if ($request->has('package_name') && $request->package_name) {
-            $query->where('event_type', 'like', '%'.$request->package_name.'%');
+            $query->where('event_type', 'like', '%' . $request->package_name . '%');
         }
 
         if ($request->has('search') && $request->search != null) {
             $query->where(function ($q) use ($request) {
-                $q->where('booking_id', 'like', '%'.$request->search.'%')
-                    ->orWhere('transaction_number', 'like', '%'.$request->search.'%')
-                    ->orWhere('event_name', 'like', '%'.$request->search.'%')
-                    ->orWhere('event_time_from', 'like', '%'.$request->search.'%')
-                    ->orWhere('event_time_to', 'like', '%'.$request->search.'%')
-                    ->orWhere('event_type', 'like', '%'.$request->search.'%')
-                    ->orWhere('guest_count', 'like', '%'.$request->search.'%')
-                    ->orWhere('special_request', 'like', '%'.$request->search.'%')
-                    ->orWhere('contact_name', 'like', '%'.$request->search.'%')
-                    ->orWhere('contact_number', 'like', '%'.$request->search.'%')
-                    ->orWhere('contact_email', 'like', '%'.$request->search.'%')
-                    ->orWhere('street_address', 'like', '%'.$request->search.'%')
-                    ->orWhere('city', 'like', '%'.$request->search.'%')
-                    ->orWhere('province', 'like', '%'.$request->search.'%');
+                $q->where('booking_id', 'like', '%' . $request->search . '%')
+                    ->orWhere('transaction_number', 'like', '%' . $request->search . '%')
+                    ->orWhere('event_name', 'like', '%' . $request->search . '%')
+                    ->orWhere('event_time_from', 'like', '%' . $request->search . '%')
+                    ->orWhere('event_time_to', 'like', '%' . $request->search . '%')
+                    ->orWhere('event_type', 'like', '%' . $request->search . '%')
+                    ->orWhere('guest_count', 'like', '%' . $request->search . '%')
+                    ->orWhere('special_request', 'like', '%' . $request->search . '%')
+                    ->orWhere('contact_name', 'like', '%' . $request->search . '%')
+                    ->orWhere('contact_number', 'like', '%' . $request->search . '%')
+                    ->orWhere('contact_email', 'like', '%' . $request->search . '%')
+                    ->orWhere('street_address', 'like', '%' . $request->search . '%')
+                    ->orWhere('city', 'like', '%' . $request->search . '%')
+                    ->orWhere('province', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -68,18 +67,18 @@ class ReportController extends Controller
         // Appointments don't have package_name, so skip
         if ($request->has('search') && $request->search != null) {
             $query->where(function ($q) use ($request) {
-                $q->where('appointment_id', 'like', '%'.$request->search.'%')
-                    ->orWhere('contact_name', 'like', '%'.$request->search.'%')
-                    ->orWhere('contact_email', 'like', '%'.$request->search.'%')
-                    ->orWhere('contact_phone', 'like', '%'.$request->search.'%')
-                    ->orWhere('purpose', 'like', '%'.$request->search.'%')
-                    ->orWhere('appointment_date', 'like', '%'.$request->search.'%');
+                $q->where('appointment_id', 'like', '%' . $request->search . '%')
+                    ->orWhere('contact_name', 'like', '%' . $request->search . '%')
+                    ->orWhere('contact_email', 'like', '%' . $request->search . '%')
+                    ->orWhere('contact_phone', 'like', '%' . $request->search . '%')
+                    ->orWhere('purpose', 'like', '%' . $request->search . '%')
+                    ->orWhere('appointment_date', 'like', '%' . $request->search . '%');
             });
         }
 
         $appointment = $query->get();
 
-        $query = \App\Models\ServiceBooking::where('status', 'completed');
+        $query = \App\Models\ServiceBooking::withTrashed()->where('status', 'completed');
 
         // Apply filters
         if ($request->has('date') && $request->date) {
@@ -92,17 +91,17 @@ class ReportController extends Controller
             $query->whereYear('date', $request->year);
         }
         if ($request->has('package_name') && $request->package_name) {
-            $query->where('service_name', 'like', '%'.$request->package_name.'%');
+            $query->where('service_name', 'like', '%' . $request->package_name . '%');
         }
 
         if ($request->has('search') && $request->search != null) {
             $query->where(function ($q) use ($request) {
-                $q->where('service_booking_id', 'like', '%'.$request->search.'%')
-                    ->orWhere('title', 'like', '%'.$request->search.'%')
-                    ->orWhere('service_name', 'like', '%'.$request->search.'%')
-                    ->orWhere('description', 'like', '%'.$request->search.'%')
-                    ->orWhere('comment', 'like', '%'.$request->search.'%')
-                    ->orWhere('date', 'like', '%'.$request->search.'%');
+                $q->where('service_booking_id', 'like', '%' . $request->search . '%')
+                    ->orWhere('title', 'like', '%' . $request->search . '%')
+                    ->orWhere('service_name', 'like', '%' . $request->search . '%')
+                    ->orWhere('description', 'like', '%' . $request->search . '%')
+                    ->orWhere('comment', 'like', '%' . $request->search . '%')
+                    ->orWhere('date', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -113,7 +112,6 @@ class ReportController extends Controller
             'appointment' => $appointment,
             'service_booking' => $service_booking,
         ]);
-
     }
 
 

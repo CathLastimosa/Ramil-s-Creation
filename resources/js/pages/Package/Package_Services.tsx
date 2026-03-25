@@ -5,12 +5,11 @@ import ManageServices from '../Services/ManageServices';
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Packages', href: '/package' },
-  { title: 'View Services', href: '#' } // dynamic title later
+  { title: 'View Services', href: '#' }
 ];
 
 
 export default function PackageServices() {
-  // Get data from the backend
   const page = usePage<{ package: any }>();
   const packageData = page.props.package || {};
 

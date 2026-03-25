@@ -1,7 +1,8 @@
+import { printAppointments, printBookings, printServiceBookings } from '@/components/PrintUtils';
+import { EmptyEventBookings } from '@/components/empty/empty-events';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button-shad';
 import { CardDescription, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -16,9 +17,6 @@ import debounce from 'lodash/debounce';
 import { Download, Filter, Printer, Search, Send, Trash2, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-// Import the new print utilities
-import { printAppointments, printBookings, printServiceBookings } from '@/components/PrintUtils';
-import { EmptyEventBookings } from '@/components/empty/empty-events';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Report', href: 'report' }];
 
@@ -47,6 +45,8 @@ interface AppointmentType {
     contact_phone: string;
     purpose: string;
     appointment_date: string;
+    appointment_time_from: string;
+    appointment_time_to: string;
 }
 
 interface ServiceBookingType {
@@ -130,59 +130,17 @@ export default function Report({
         }
     }
 
-    const [selectedBookingIds, setSelectedBookingIds] = useState<Set<string>>(new Set());
-
-    const toggleAllBookings = (checked: boolean) => {
-        if (checked) {
-            const allIds = new Set(booking.map((pkg) => pkg.booking_id));
-            setSelectedBookingIds(allIds);
-        } else {
-            setSelectedBookingIds(new Set());
-        }
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     };
 
-    const toggleBookingSelection = (id: string, checked: boolean) => {
-        setSelectedBookingIds((prev) => {
-            const newSet = new Set(prev);
-            if (checked) {
-                newSet.add(id);
-            } else {
-                newSet.delete(id);
-            }
-            return newSet;
-        });
+    const formatTime = (timeString: string) => {
+        const [hours, minutes] = timeString.split(':').map(Number);
+        const period = hours >= 12 ? 'PM' : 'AM';
+        const displayHours = hours % 12 || 12;
+        return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
     };
-
-    const isAllBookingsSelected = selectedBookingIds.size === booking.length && booking.length > 0;
-    const isIndeterminateBookings = selectedBookingIds.size > 0 && selectedBookingIds.size < booking.length;
-
-    // Selection state for appointments
-    const [selectedAppointmentIds, setSelectedAppointmentIds] = useState<Set<string>>(new Set());
-
-    const toggleAllAppointments = (checked: boolean) => {
-        if (checked) {
-            const allIds = new Set(appointment.map((pkg) => pkg.appointment_id));
-            setSelectedAppointmentIds(allIds);
-        } else {
-            setSelectedAppointmentIds(new Set());
-        }
-    };
-
-    const toggleAppointmentSelection = (id: string, checked: boolean) => {
-        setSelectedAppointmentIds((prev) => {
-            const newSet = new Set(prev);
-            if (checked) {
-                newSet.add(id);
-            } else {
-                newSet.delete(id);
-            }
-            return newSet;
-        });
-    };
-
-    const isAllAppointmentsSelected = selectedAppointmentIds.size === appointment.length && appointment.length > 0;
-    const isIndeterminateAppointments = selectedAppointmentIds.size > 0 && selectedAppointmentIds.size < appointment.length;
-
     const openReportPdf = (bookingId: string) => {
         window.open(`/admin-booking/${bookingId}/report-pdf`, '_blank');
     };
@@ -328,11 +286,6 @@ export default function Report({
                                                         <SelectContent>
                                                             <SelectItem value="Wedding">Wedding</SelectItem>
                                                             <SelectItem value="Birthday">Birthday</SelectItem>
-                                                            <SelectItem value="Corporate">Corporate</SelectItem>
-                                                            <SelectItem value="Debut">Debut</SelectItem>
-                                                            <SelectItem value="Baptismal">Baptismal</SelectItem>
-                                                            <SelectItem value="Funeral">Funeral</SelectItem>
-                                                            <SelectItem value="Others">Others</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                 </div>
@@ -380,22 +333,14 @@ export default function Report({
                             </TabsTrigger>
                         </TabsList>
                     </div>
-                    {/* ... (Rest of the JSX for tabs and tables remains unchanged) */}
                     <TabsContent value="bookings">
                         <div className="overflow-x-auto">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="w-[50px]">
-                                            <Checkbox
-                                                checked={isAllBookingsSelected || isIndeterminateBookings}
-                                                onCheckedChange={toggleAllBookings}
-                                                aria-label="Select all bookings"
-                                            />
-                                        </TableHead>
+                                        <TableHead>Event Date & Time</TableHead>
                                         <TableHead>Transaction Number</TableHead>
                                         <TableHead>Event Name</TableHead>
-                                        <TableHead>Event Date</TableHead>
                                         <TableHead className="hidden sm:table-cell">Event Type</TableHead>
                                         <TableHead className="hidden sm:table-cell">Contact Name</TableHead>
                                         <TableHead>Action</TableHead>
@@ -404,24 +349,19 @@ export default function Report({
                                 <TableBody>
                                     {booking.length > 0 ? (
                                         booking.map((b) => (
-                                            <TableRow key={b.booking_id}>
-                                                <TableCell className="w-[50px]">
-                                                    <Checkbox
-                                                        checked={selectedBookingIds.has(b.booking_id)}
-                                                        onCheckedChange={(checked) => toggleBookingSelection(b.booking_id, checked === true)}
-                                                        aria-label={`Select booking ${b.event_name}`}
-                                                    />
+                                            <TableRow key={b.transaction_number}>
+                                                <TableCell>
+                                                    {formatDate(b.event_date)} {formatTime(b.event_time_from)} - {formatTime(b.event_time_to)}
                                                 </TableCell>
                                                 <TableCell>{b.transaction_number}</TableCell>
                                                 <TableCell>{b.event_name}</TableCell>
-                                                <TableCell>{b.event_date}</TableCell>
                                                 <TableCell className="hidden sm:table-cell">{b.event_type}</TableCell>
                                                 <TableCell className="hidden sm:table-cell">{b.contact_name}</TableCell>
                                                 <TableCell className="flex items-center justify-center space-x-3">
                                                     <Button
                                                         variant="link"
                                                         className="cursor-pointer underline hover:text-accent2 hover:underline"
-                                                        onClick={() => openReportPdf(b.booking_id)}
+                                                        onClick={() => openReportPdf(b.transaction_number)}
                                                     >
                                                         <Download />
                                                     </Button>
@@ -435,7 +375,7 @@ export default function Report({
                                         ))
                                     ) : (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="text-center">
+                                            <TableCell colSpan={6} className="text-center">
                                                 <EmptyEventBookings
                                                     title="No events found"
                                                     action={
@@ -457,18 +397,11 @@ export default function Report({
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="w-[50px]">
-                                            <Checkbox
-                                                checked={isAllAppointmentsSelected || isIndeterminateAppointments}
-                                                onCheckedChange={toggleAllAppointments}
-                                                aria-label="Select all appointments"
-                                            />
-                                        </TableHead>
+                                        <TableHead>Appointment Date & Time</TableHead>
                                         <TableHead>Contact Name</TableHead>
                                         <TableHead className="hidden sm:table-cell">Contact Email</TableHead>
                                         <TableHead className="hidden sm:table-cell">Contact Phone</TableHead>
                                         <TableHead>Purpose</TableHead>
-                                        <TableHead>Appointment Date</TableHead>
                                         <TableHead>Action</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -476,18 +409,14 @@ export default function Report({
                                     {appointment.length > 0 ? (
                                         appointment.map((a) => (
                                             <TableRow key={a.appointment_id}>
-                                                <TableCell className="w-[50px]">
-                                                    <Checkbox
-                                                        checked={selectedAppointmentIds.has(a.appointment_id)}
-                                                        onCheckedChange={(checked) => toggleAppointmentSelection(a.appointment_id, checked === true)}
-                                                        aria-label={`Select appointment ${a.purpose}`}
-                                                    />
+                                                <TableCell>
+                                                    {formatDate(a.appointment_date)} {formatTime(a.appointment_time_from)} -{' '}
+                                                    {formatTime(a.appointment_time_to)}
                                                 </TableCell>
                                                 <TableCell>{a.contact_name}</TableCell>
                                                 <TableCell className="hidden sm:table-cell">{a.contact_email}</TableCell>
                                                 <TableCell className="hidden sm:table-cell">{a.contact_phone}</TableCell>
                                                 <TableCell>{a.purpose}</TableCell>
-                                                <TableCell>{a.appointment_date}</TableCell>
                                                 <TableCell className="flex justify-center space-x-3">
                                                     <Tooltip>
                                                         <TooltipTrigger>
@@ -535,29 +464,17 @@ export default function Report({
 function ServiceBookingTable({ service_booking }: { service_booking: ServiceBookingType[] }) {
     const [selectedServiceBookingIds, setSelectedServiceBookingIds] = useState<Set<number>>(new Set());
 
-    const toggleAllServiceBookings = (checked: boolean) => {
-        if (checked) {
-            const allIds = new Set(service_booking.map((sb) => sb.service_booking_id));
-            setSelectedServiceBookingIds(allIds);
-        } else {
-            setSelectedServiceBookingIds(new Set());
-        }
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     };
 
-    const toggleServiceBookingSelection = (id: number, checked: boolean) => {
-        setSelectedServiceBookingIds((prev) => {
-            const newSet = new Set(prev);
-            if (checked) {
-                newSet.add(id);
-            } else {
-                newSet.delete(id);
-            }
-            return newSet;
-        });
+    const formatTime = (timeString: string) => {
+        const [hours, minutes] = timeString.split(':').map(Number);
+        const period = hours >= 12 ? 'PM' : 'AM';
+        const displayHours = hours % 12 || 12;
+        return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
     };
-
-    const isAllServiceBookingsSelected = selectedServiceBookingIds.size === service_booking.length && service_booking.length > 0;
-    const isIndeterminateServiceBookings = selectedServiceBookingIds.size > 0 && selectedServiceBookingIds.size < service_booking.length;
 
     const confirmDeleteServiceBooking = (id: number) => {
         if (window.confirm('Are you sure you want to permanently delete this service booking?')) {
@@ -571,7 +488,6 @@ function ServiceBookingTable({ service_booking }: { service_booking: ServiceBook
             return;
         }
         if (window.confirm(`Are you sure you want to permanently delete ${selectedServiceBookingIds.size} service booking(s)?`)) {
-            // Force delete all selected
             const deletePromises = Array.from(selectedServiceBookingIds).map((id) =>
                 router.delete(route('service-booking.report.destroy', { id }), { preserveScroll: true }),
             );
@@ -600,17 +516,9 @@ function ServiceBookingTable({ service_booking }: { service_booking: ServiceBook
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-[50px]">
-                            <Checkbox
-                                checked={isAllServiceBookingsSelected || isIndeterminateServiceBookings}
-                                onCheckedChange={toggleAllServiceBookings}
-                                aria-label="Select all service bookings"
-                            />
-                        </TableHead>
-                        <TableHead>ID</TableHead>
+                        <TableHead>Date & Time</TableHead>
                         <TableHead>Title</TableHead>
                         <TableHead>Service Name</TableHead>
-                        <TableHead>Date</TableHead>
                         <TableHead>Total Amount</TableHead>
                         <TableHead>Paid Amount</TableHead>
                         <TableHead>Action</TableHead>
@@ -620,17 +528,11 @@ function ServiceBookingTable({ service_booking }: { service_booking: ServiceBook
                     {service_booking.length > 0 ? (
                         service_booking.map((sb) => (
                             <TableRow key={sb.service_booking_id}>
-                                <TableCell className="w-[50px]">
-                                    <Checkbox
-                                        checked={selectedServiceBookingIds.has(sb.service_booking_id)}
-                                        onCheckedChange={(checked) => toggleServiceBookingSelection(sb.service_booking_id, checked === true)}
-                                        aria-label={`Select service booking ${sb.title}`}
-                                    />
+                                <TableCell>
+                                    {formatDate(sb.date)} {formatTime(sb.start_time)} - {formatTime(sb.end_time)}
                                 </TableCell>
-                                <TableCell>{sb.service_booking_id}</TableCell>
                                 <TableCell>{sb.title}</TableCell>
                                 <TableCell>{sb.service_name}</TableCell>
-                                <TableCell>{sb.date}</TableCell>
                                 <TableCell>₱ {sb.total_amount}</TableCell>
                                 <TableCell>₱ {sb.paid_amount}</TableCell>
                                 <TableCell className="flex justify-center space-x-3">
@@ -649,7 +551,7 @@ function ServiceBookingTable({ service_booking }: { service_booking: ServiceBook
                         ))
                     ) : (
                         <TableRow>
-                            <TableCell colSpan={8} className="text-center">
+                            <TableCell colSpan={6} className="text-center">
                                 <EmptyEventBookings
                                     title="No service found"
                                     action={
@@ -658,7 +560,7 @@ function ServiceBookingTable({ service_booking }: { service_booking: ServiceBook
                                             <span>Go to Module</span>
                                         </Button>
                                     }
-                                />{' '}
+                                />
                             </TableCell>
                         </TableRow>
                     )}

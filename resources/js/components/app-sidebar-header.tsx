@@ -4,7 +4,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import { Bell } from 'lucide-react';
+import Pusher from 'pusher-js';
 import { useEffect, useState } from 'react';
+import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 
 interface Notification {
@@ -78,13 +80,46 @@ function getStatusColor(status: string) {
 
 export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemType[] }) {
     const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+    const [newNotificationCount, setNewNotificationCount] = useState(0);
+    const [lastOpened, setLastOpened] = useState<string | null>(localStorage.getItem('notificationLastOpened'));
+    const [currentTime, setCurrentTime] = useState<string>(() => {
+        const now = new Date();
+        const day = now.toLocaleDateString('en-US', { weekday: 'long' });
+        const month = now.toLocaleDateString('en-US', { month: 'short' });
+        const date = now.getDate();
+        const hours = now.getHours();
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'pm' : 'am';
+        const hour12 = hours % 12 || 12;
+        return `${day}, ${month} ${date} : ${hour12}:${minutes}:${seconds}${ampm}`;
+    });
 
-    useEffect(() => {
+    const updateTime = () => {
+        const now = new Date();
+        const day = now.toLocaleDateString('en-US', { weekday: 'long' });
+        const month = now.toLocaleDateString('en-US', { month: 'short' });
+        const date = now.getDate();
+        const hours = now.getHours();
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'pm' : 'am';
+        const hour12 = hours % 12 || 12;
+        setCurrentTime(`${day}, ${month} ${date} : ${hour12}:${minutes}:${seconds}${ampm}`);
+    };
+
+    const fetchNotifications = () => {
         fetch('/api/notifications')
             .then((res) => res.json())
             .then((data) => {
-                if (Array.isArray(data)) setNotifications(data);
-                else {
+                if (Array.isArray(data)) {
+                    setNotifications(data);
+                    // Calculate new notifications count based on last opened time
+                    const lastOpenedTime = lastOpened ? new Date(lastOpened).getTime() : 0;
+                    const newCount = data.filter((n) => new Date(n.created_at).getTime() > lastOpenedTime).length;
+                    setNewNotificationCount(newCount);
+                } else {
                     console.error('Invalid notification data:', data);
                     setNotifications([]);
                 }
@@ -93,6 +128,44 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                 console.error('Failed to fetch notifications:', err);
                 setNotifications([]);
             });
+    };
+
+    useEffect(() => {
+        fetchNotifications();
+
+        Pusher.logToConsole = true;
+
+        const pusher = new Pusher('c5ecd7c26e7d1988a375', {
+            cluster: 'ap1',
+        });
+
+        const channel = pusher.subscribe('appointments');
+
+        const handleStoreEvent = function (data: any) {
+            console.log('Received store event for notifications:', data);
+            // Refetch notifications to update the sidebar in real-time
+            fetchNotifications();
+            // Increment new notification count if popover is not open
+            if (!isPopoverOpen) {
+                setNewNotificationCount((prev) => prev + 1);
+            }
+        };
+
+        // Bind to the same event names as in app-layout.tsx
+        channel.bind('appointments.store', handleStoreEvent);
+        channel.bind('appointment.store', handleStoreEvent);
+
+        return () => {
+            channel.unbind_all();
+            channel.unsubscribe();
+        };
+    }, []);
+
+    useEffect(() => {
+        updateTime();
+        const interval = setInterval(updateTime, 1000);
+
+        return () => clearInterval(interval);
     }, []);
 
     const renderNotificationText = (n: Notification) => {
@@ -218,28 +291,37 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
 
             <div className="flex items-center">
                 <span className="mr-4 text-sm text-gray-600 dark:text-white">
-                    {(() => {
-                        const now = new Date();
-                        const day = now.toLocaleDateString('en-US', { weekday: 'long' });
-                        const month = now.toLocaleDateString('en-US', { month: 'short' });
-                        const date = now.getDate();
-                        const hour = now.getHours();
-                        const ampm = hour >= 12 ? 'pm' : 'am';
-                        const hour12 = hour % 12 || 12;
-                        return `${day}, ${month} ${date} : ${hour12}${ampm}`;
-                    })()}
+                    {currentTime}
                 </span>
-                <Popover>
+                <Popover
+                    onOpenChange={(open) => {
+                        setIsPopoverOpen(open);
+                        if (open) {
+                            const now = new Date().toISOString();
+                            localStorage.setItem('notificationLastOpened', now);
+                            setLastOpened(now);
+                            setNewNotificationCount(0);
+                        }
+                    }}
+                >
                     <PopoverTrigger asChild>
-                        <Button size="icon" variant="outline" className="relative bg-white shadow-sm hover:bg-gray-50 dark:bg-black dark:hover:bg-gray-900">
+                        <Button
+                            size="icon"
+                            variant="outline"
+                            className="relative bg-white shadow-sm hover:bg-gray-50 dark:bg-black dark:hover:bg-gray-900"
+                        >
                             <Bell className="text-gray-700 dark:text-white" />
-                            {notifications.length > 0 && <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />}
+                            {newNotificationCount > 0 && (
+                                <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs">
+                                    {newNotificationCount}
+                                </Badge>
+                            )}
                         </Button>
                     </PopoverTrigger>
 
-                    <PopoverContent align="end" className="w-85 rounded-2xl border border-gray-100 bg-white shadow-xl">
+                    <PopoverContent align="end" className="w-85 rounded-2xl border border-gray-100 bg-white shadow-xl dark:bg-muted">
                         <div className="flex items-center justify-between border-b border-gray-100 px-3 py-2">
-                            <h4 className="text-sm font-semibold text-gray-800">Notifications</h4>
+                            <h4 className="text-sm font-semibold text-gray-800 dark:text-white">Notifications</h4>
                         </div>
 
                         <ScrollArea className="h-96">
@@ -250,9 +332,11 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                     {notifications.map((notif) => (
                                         <div
                                             key={notif.id}
-                                            className="cursor-pointer space-y-2 rounded-lg bg-white px-3 py-3 transition hover:bg-gray-50"
+                                            className="cursor-pointer space-y-2 rounded-lg bg-white px-3 py-3 transition hover:bg-gray-50 dark:bg-muted"
                                         >
-                                            <div className="text-[13px] leading-relaxed text-gray-800">{renderNotificationText(notif)}</div>
+                                            <div className="text-[13px] leading-relaxed text-gray-800 dark:text-white">
+                                                {renderNotificationText(notif)}
+                                            </div>
 
                                             <div className="flex items-center gap-2">
                                                 <div className="mt-1 text-xs text-gray-400">Email status:</div>

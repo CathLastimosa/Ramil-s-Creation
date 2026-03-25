@@ -24,6 +24,7 @@ export default function OverallShopRating({ averageRating, contactNames }: Overa
                     ))}
                 </div>
             </div>
+            <div className="mt-1 text-sm text-background dark:text-gray-300">Average rating this year</div>
         </div>
     );
 }

@@ -40,6 +40,8 @@ export interface EventCalendarProps {
     initialView?: CalendarView;
     appointmentTimes?: Record<string, { from: string; to: string; status: string }[]>;
     blockedtimes?: Record<string, { from: string; to: string }[]>;
+    bookedTimes?: Record<string, { from: string; to: string; status: string }[]>;
+    servicebookingtimes?: Record<string, { from: string; to: string }[]>;
 }
 
 export function EventCalendar({
@@ -50,7 +52,9 @@ export function EventCalendar({
     className,
     initialView = 'month',
     appointmentTimes,
-    blockedtimes,
+    blockedtimes = {},
+    bookedTimes = {},
+    servicebookingtimes = {},
 }: EventCalendarProps) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
 
@@ -67,6 +71,53 @@ export function EventCalendar({
     const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
     const [isCreateChooserOpen, setIsCreateChooserOpen] = useState(false);
     const [createSource, setCreateSource] = useState<'event_booking' | 'appointment' | 'service_booking' | null>(null);
+    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+    const formatLocalDate = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+
+
+    const bookingSlots = [
+        { label: 'Full-Day Event', from: '07:00', to: '20:00' },
+        { label: 'Half-Day Event', from: '07:00', to: '12:00' },
+        { label: 'Half-Day Event', from: '13:00', to: '18:00' },
+        { label: 'Short-Day Event', from: '07:00', to: '10:00' },
+        { label: 'Short-Day Event', from: '11:00', to: '14:00' },
+        { label: 'Short-Day Event', from: '15:00', to: '18:00' },
+        { label: 'Short-Day Event', from: '19:00', to: '20:00' },
+    ];
+
+    const formatTo12Hour = (time24: string) => {
+        let [hour, minute] = time24.split(':').map(Number);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12 || 12;
+        return `${hour}:${minute.toString().padStart(2, '0')} ${ampm}`;
+    };
+
+    const isSlotUnavailable = (slot: (typeof bookingSlots)[0], date: Date) => {
+        const dateKey = formatLocalDate(date);
+        const booked =
+            bookedTimes[dateKey]?.some(
+                (t) => (slot.from >= t.from && slot.from < t.to) || (slot.to > t.from && slot.to <= t.to) || (slot.from <= t.from && slot.to >= t.to),
+            ) ?? false;
+
+        const blocked =
+            blockedtimes[dateKey]?.some(
+                (t) => (slot.from >= t.from && slot.from < t.to) || (slot.to > t.from && slot.to <= t.to) || (slot.from <= t.from && slot.to >= t.to),
+            ) ?? false;
+
+        const servicebooked =
+            servicebookingtimes[dateKey]?.some(
+                (t) => (slot.from >= t.from && slot.from < t.to) || (slot.to > t.from && slot.to <= t.to) || (slot.from <= t.from && slot.to >= t.to),
+            ) ?? false;
+
+        return booked || blocked || servicebooked;
+    };
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -217,6 +268,8 @@ export function EventCalendar({
             startTime.setSeconds(0);
             startTime.setMilliseconds(0);
         }
+
+        setSelectedDate(startTime);
 
         const newEvent: CalendarEvent = {
             id: '',
@@ -669,13 +722,51 @@ export function EventCalendar({
                     forceSource={(createSource as any) || undefined}
                     appointmentTimes={appointmentTimes}
                     blockedtimes={blockedtimes}
+                    bookedTimes={bookedTimes}
+                    servicebookingtimes={servicebookingtimes}
                 />
                 {isCreateChooserOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                         <div className="absolute inset-0 bg-black/40" onClick={() => setIsCreateChooserOpen(false)} />
                         <div className="relative w-full max-w-sm rounded bg-white p-4 shadow-lg dark:bg-gray-600">
-                            <h3 className="mb-2 text-lg font-medium dark:text-gray-100">Create new</h3>
-                            <div className="flex flex-col gap-2">
+                            {selectedDate && (
+                                <div className="mt-6">
+                                    <h3 className="m-4 text-lg font-medium">Available Time Slots for {selectedDate.toDateString()}</h3>
+                                    {Object.entries(
+                                        bookingSlots.reduce(
+                                            (groups, slot) => {
+                                                if (!groups[slot.label]) groups[slot.label] = [];
+                                                groups[slot.label].push(slot);
+                                                return groups;
+                                            },
+                                            {} as Record<string, typeof bookingSlots>,
+                                        ),
+                                    ).map(([label, slots], groupIdx) => (
+                                        <div key={groupIdx} className="m-4">
+                                            <p className="mb-2 font-semibold text-sm">{label}</p>
+                                            <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+                                                {slots.map((slot, idx) => {
+                                                    const unavailable = isSlotUnavailable(slot, selectedDate);
+                                                    return (
+                                                        <Button
+                                                            key={idx}
+                                                            variant={unavailable ? 'ghost' : 'ghost'}
+                                                            className={`p-2 text-sm ${
+                                                                unavailable ? 'cursor-not-allowed text-gray-400 line-through' : 'text-accent2'
+                                                            }`}
+                                                            disabled={unavailable}
+                                                        >
+                                                            {formatTo12Hour(slot.from)} - {formatTo12Hour(slot.to)}
+                                                        </Button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            <h3 className="m-4 text-lg font-medium dark:text-gray-100">Create new</h3>
+                            <div className="m-4 flex flex-col gap-2">
                                 <Button
                                     variant="brand"
                                     className="bg-accent2"

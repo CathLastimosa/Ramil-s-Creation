@@ -8,6 +8,7 @@ use App\Models\AssignedStaff;
 use App\Models\Bookings;
 use App\Models\BookingSelectedServices;
 use App\Models\Package;
+use App\Models\Services;
 use App\Models\Payments;
 use App\Models\Staff;
 use App\Models\StaffAvailability;
@@ -72,10 +73,19 @@ class BookingController extends Controller
         $booking->update(['transaction_number' => $transactionNumber]);
 
         foreach ($validated['selected_services'] as $services_id) {
+            $service = Services::find($services_id);
             BookingSelectedServices::create([
                 'package_id' => $validated['package_id'],
                 'services_id' => $services_id,
                 'booking_id' => $booking->booking_id,
+                'package_name' => $package->package_name,
+                'package_description' => $package->package_description,
+                'package_price' => $package->package_price,
+                'package_promo' => $package->package_promo,
+                'discounted_price' => $package->discounted_price,
+                'service_name' => $service->service_name,
+                'service_description' => $service->service_description,
+                'service_image' => $service->image,
             ]);
         }
 
@@ -173,9 +183,7 @@ class BookingController extends Controller
         $booking = Bookings::where('transaction_number', $request->transaction_number)->first();
 
         if (! $booking) {
-            return redirect()->back()->with([
-                'error' => 'Booking not found with this transaction number.',
-            ]);
+            return redirect('/track-booking')->withErrors(['transaction_number' => 'Booking not found with this transaction number.']);
         }
 
         $booking->payments = Payments::where('booking_id', $booking->booking_id)->get();

@@ -14,11 +14,14 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, router, usePage } from '@inertiajs/react';
 import debounce from 'lodash/debounce';
 import {
+    Ban,
     BanknoteIcon,
     CheckCircle,
     CheckIcon,
     ChevronLeft,
     ChevronRight,
+    CircleDotDashed,
+    Hourglass,
     LoaderIcon,
     Mail,
     MapPinCheckInside,
@@ -40,28 +43,17 @@ import { toast } from 'sonner';
 
 const breadcrumbs = [{ title: 'Bookings', href: '/appointments/index' }];
 
-interface ServiceType {
-    services_id: number;
-    service_name: string;
-    image?: string;
-    pivot?: {
-        booking_id: number;
-        services_id: number;
-        package_id: number;
-    };
-}
-
-interface PackageType {
-    package_id: number;
+interface BookingSelectedServiceType {
+    booking_selected_service_id: number;
+    booking_id: number;
     package_name: string;
+    package_description: string;
     package_price: number;
-    package_promo: string;
+    package_promo: number;
     discounted_price: number;
-    services_count: number;
-    pivot?: {
-        booking_id: number;
-        services_id: number;
-    };
+    service_name: string;
+    service_description: string;
+    service_image: string;
 }
 
 interface BookingType {
@@ -93,8 +85,7 @@ interface BookingType {
         reference_No: string;
     };
 
-    services?: ServiceType[];
-    packages?: PackageType[];
+    booking_selected_services?: BookingSelectedServiceType[];
 }
 
 export default function ManageBookings({ bookings }: { bookings: BookingType[] }) {
@@ -103,6 +94,14 @@ export default function ManageBookings({ bookings }: { bookings: BookingType[] }
         if (flash.success) toast.success(flash.success);
         if (flash.error) toast.error(flash.error);
     }, [flash.success, flash.error]);
+
+    // Add debugging to check if bookings data includes bookingSelectedServices
+    useEffect(() => {
+        console.log('Bookings data:', bookings);
+        bookings.forEach((booking) => {
+            console.log(`Booking ${booking.booking_id} - bookingSelectedServices:`, booking.booking_selected_services);
+        });
+    }, [bookings]);
 
     const handleSearch = useRef(
         debounce((query: string) => {
@@ -283,28 +282,29 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                                     <div className="flex flex-col text-left">
                                         <span className="font-semibold text-gray-900 dark:text-gray-300">{booking.event_name}</span>
-                                        <span className="text-sm text-gray-500">{booking.packages?.[0]?.package_name ?? ''}</span>
+                                        <span className="text-sm text-gray-500">
+                                            {booking.booking_selected_services?.[0]?.package_name || 'No Package Selected'}
+                                        </span>
                                     </div>
                                     <Badge
                                         variant="outline"
-                                        className={`gap-1.5 rounded-full border-0 px-2.5 py-1 text-xs font-medium capitalize ${
-                                            booking.status === 'pending'
-                                                ? 'bg-yellow-100 text-yellow-700'
-                                                : booking.status === 'completed'
-                                                  ? 'bg-emerald-100 text-emerald-700'
-                                                  : booking.status === 'cancelled'
+                                        className={`gap-1.5 rounded-full border-0 px-2.5 py-1 text-xs font-medium capitalize ${booking.status === 'pending'
+                                            ? 'bg-yellow-100 text-yellow-700'
+                                            : booking.status === 'completed'
+                                                ? 'bg-emerald-100 text-emerald-700'
+                                                : booking.status === 'cancelled'
                                                     ? 'bg-red-100 text-red-700'
                                                     : 'bg-blue-100 text-blue-700'
-                                        } `}
+                                            } `}
                                     >
                                         {booking.status === 'pending' ? (
-                                            <span className="size-1.5 rounded-full bg-yellow-500" aria-hidden="true"></span>
+                                            <Hourglass className="text-yellow-600" size={12} aria-hidden="true" />
                                         ) : booking.status === 'completed' ? (
                                             <CheckIcon className="text-emerald-500" size={12} aria-hidden="true" />
                                         ) : booking.status === 'cancelled' ? (
-                                            <span className="size-1.5 rounded-full bg-red-500" aria-hidden="true"></span>
+                                            <Ban className="text-red-600" size={12} aria-hidden="true" />
                                         ) : (
-                                            <span className="size-1.5 rounded-full bg-blue-500" aria-hidden="true"></span>
+                                            <CircleDotDashed className="text-blue-600" size={12} aria-hidden="true" />
                                         )}
                                         {booking.status}
                                     </Badge>
@@ -334,7 +334,7 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                     <span className="rounded-xl bg-red-200 px-3 py-3 text-sm font-medium text-red-900">
                                         {formatDateToWords(booking.event_date)}
                                         <span className="text-red-300"> | </span>
-                                        {formatTimeTo12Hour(booking.event_time_from)}
+                                        {formatTimeTo12Hour(booking.event_time_from)} - {formatTimeTo12Hour(booking.event_time_to)}
                                     </span>
                                 </div>
                             </div>
@@ -342,7 +342,6 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
 
                         <AccordionContent className="rounded-b-xl bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-8 dark:from-black dark:to-black">
                             <div className="grid grid-cols-1 gap-4 sm:gap-10 md:grid-cols-2">
-                                {/* Booking Details */}
                                 <Card className="overflow-hidden border border-gray-200/70 shadow-sm transition-shadow duration-300 hover:shadow-md">
                                     <CardHeader className="flex items-center gap-2 border-b border-gray-200 bg-gray-50/70 px-6 py-4 dark:bg-gray-800">
                                         <User className="h-5 w-5 text-blue-600" />
@@ -350,43 +349,38 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                     </CardHeader>
 
                                     <CardContent className="space-y-4 p-6 text-sm text-gray-700">
-                                        {/* Transaction Number */}
                                         <div className="flex justify-between border-b border-gray-100 pb-2">
                                             <span className="text-gray-500 dark:text-gray-300">Transaction Number</span>
                                             <span className="font-medium text-gray-900 dark:text-gray-300">{booking.transaction_number}</span>
                                         </div>
-                                        {/* Guests */}
+
                                         <div className="flex justify-between border-b border-gray-100 pb-2">
                                             <span className="text-gray-500 dark:text-gray-300">Guests</span>
                                             <span className="font-medium text-gray-900 dark:text-gray-300">{booking.guest_count}</span>
                                         </div>
 
-                                        {/* Contact Name */}
                                         <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
                                             <User size={16} className="text-gray-500 dark:text-gray-300" />
                                             <span className="font-medium text-gray-800 dark:text-gray-300">{booking.contact_name}</span>
                                         </div>
 
-                                        {/* Contact Email */}
                                         <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
                                             <Mail size={16} className="text-gray-500 dark:text-gray-300" />
                                             <span className="text-gray-700 dark:text-gray-300">{booking.contact_email}</span>
                                         </div>
 
-                                        {/* Contact Number */}
                                         <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
                                             <Phone size={16} className="text-gray-500 dark:text-gray-300" />
                                             <span className="text-gray-700 dark:text-gray-300">{booking.contact_number}</span>
                                         </div>
 
-                                        {/* Address */}
                                         <div className="flex items-start gap-2 border-b border-gray-100 pb-2">
                                             <MapPinCheckInside size={16} className="mt-0.5 text-gray-500 dark:text-gray-300" />
                                             <span className="leading-tight text-gray-700 dark:text-gray-300">
                                                 {booking.street_address}, {booking.city}, {booking.province}
                                             </span>
                                         </div>
-                                        {/* Special Request */}
+
                                         {booking.special_request && (
                                             <div className="flex items-start gap-2 rounded-lg bg-pink-50 px-3 py-2 text-sm font-medium">
                                                 <span className="leading-tight text-accent2">📌 {booking.special_request}</span>
@@ -395,7 +389,6 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                     </CardContent>
                                 </Card>
 
-                                {/* Downpayment */}
                                 <Card className="overflow-hidden border border-gray-200/70 shadow-sm transition-shadow duration-300 hover:shadow-md">
                                     <CardHeader className="flex items-center gap-2 border-b border-gray-200 bg-gray-50/70 px-6 py-4 dark:bg-gray-800">
                                         <Wallet className="h-5 w-5 text-green-600" />
@@ -403,7 +396,6 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                     </CardHeader>
 
                                     <CardContent className="space-y-4 p-6 text-sm text-gray-700">
-                                        {/* Method */}
                                         <div className="flex items-center justify-between border-b border-gray-100 pb-2">
                                             <span className="text-gray-500 dark:text-gray-300">Payment Method</span>
                                             <span className="flex items-center gap-3">
@@ -420,17 +412,17 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                                             <DialogTrigger asChild>
                                                                 <Button
                                                                     variant="outline"
-                                                                    size="icon"
-                                                                    className="h-6 w-6 border-gray-300 hover:bg-gray-100"
+                                                                    className="border-gray-300 hover:bg-gray-100 hover:text-black"
                                                                 >
-                                                                    <View size={14} className="opacity-60" />
+                                                                    <View size={20} className="opacity-60 hover:text-black hover:border-gray-300" />
+                                                                    View Proof
                                                                 </Button>
                                                             </DialogTrigger>
                                                             <DialogContent>
                                                                 <DialogHeader>
                                                                     <DialogTitle>GCash Receipt</DialogTitle>
                                                                     <DialogDescription>
-                                                                        {/* You can insert an image or receipt preview here */}
+                                                                        <img src={`storage/${booking.payment?.payment_proof}`} alt="gcash receipt" />
                                                                     </DialogDescription>
                                                                 </DialogHeader>
                                                                 <DialogFooter>
@@ -465,11 +457,10 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                             </span>
                                         </div>
                                         <div
-                                            className={`mt-4 rounded-lg px-3 py-2 text-sm font-medium ${
-                                                Number(booking.payment?.amount || 0) >= Number(booking.total_amount)
-                                                    ? 'bg-green-50 text-green-700 dark:bg-emerald-900/30 dark:text-green-300'
-                                                    : 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300'
-                                            }`}
+                                            className={`mt-4 rounded-lg px-3 py-2 text-sm font-medium ${Number(booking.payment?.amount || 0) >= Number(booking.total_amount)
+                                                ? 'bg-green-50 text-green-700 dark:bg-emerald-900/30 dark:text-green-300'
+                                                : 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300'
+                                                }`}
                                         >
                                             {Number(booking.payment?.amount || 0) >= Number(booking.total_amount)
                                                 ? '✅ Fully Paid'
@@ -480,20 +471,24 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                             </div>
 
                             {/* Package Summary */}
-                            {booking.packages && booking.packages.length > 0 && (
+                            {booking.booking_selected_services && booking.booking_selected_services.length > 0 ? (
                                 <Card className="mt-10 rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:bg-gray-800">
                                     <div className="grid grid-cols-2 gap-6 text-center md:grid-cols-4">
                                         <div>
                                             <p className="font-medium text-gray-600 dark:text-gray-300">Package</p>
-                                            <p className="text-gray-900 dark:text-gray-300">{booking.packages[0].package_name}</p>
+                                            <p className="text-gray-900 dark:text-gray-300">
+                                                {booking.booking_selected_services[0]?.package_name || 'N/A'}
+                                            </p>
                                         </div>
                                         <div>
                                             <p className="font-medium text-gray-600 dark:text-gray-300">Services</p>
-                                            <p className="text-gray-900 dark:text-gray-300">{booking.services?.length || 0}</p>
+                                            <p className="text-gray-900 dark:text-gray-300">{booking.booking_selected_services.length}</p>
                                         </div>
                                         <div>
                                             <p className="font-medium text-gray-600 dark:text-gray-300">Promo</p>
-                                            <p className="text-gray-900 dark:text-gray-300">{booking.packages[0].package_promo}%</p>
+                                            <p className="text-gray-900 dark:text-gray-300">
+                                                {booking.booking_selected_services[0]?.package_promo || 0}%
+                                            </p>
                                         </div>
                                         <div>
                                             <p className="font-medium text-gray-600 dark:text-gray-300">Total</p>
@@ -503,29 +498,33 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                         </div>
                                     </div>
                                 </Card>
+                            ) : (
+                                <div className="mt-10 text-center text-gray-500">
+                                    No package or services selected for this booking.
+                                </div>
                             )}
 
                             {/* Selected Services */}
-                            {booking.services && booking.services.length > 0 && (
+                            {booking.booking_selected_services && booking.booking_selected_services.length > 0 ? (
                                 <div className="mt-10">
                                     <h4 className="mb-3 text-lg font-semibold text-gray-800 dark:text-gray-300">Selected Services</h4>
                                     <div className="relative">
                                         <div ref={servicesScrollRef} className="flex gap-4 overflow-x-auto scroll-smooth pb-3">
-                                            {booking.services.map((srv) => (
+                                            {booking.booking_selected_services.map((srv) => (
                                                 <div
-                                                    key={srv.services_id}
+                                                    key={srv.booking_selected_service_id}
                                                     className="relative w-[160px] flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition hover:shadow-md dark:bg-gray-800"
                                                 >
                                                     <div className="flex h-[110px] items-center justify-center overflow-hidden bg-gray-100">
                                                         <img
-                                                            src={srv.image ? `/storage/${srv.image}` : '/default-image.png'}
-                                                            alt={srv.service_name}
+                                                            src={srv.service_image ? `/storage/${srv.service_image}` : '/default-image.png'}
+                                                            alt={srv.service_name || 'Service'}
                                                             className="h-full w-full object-cover"
                                                         />
                                                     </div>
                                                     <div className="p-2 text-center">
                                                         <span className="text-sm font-medium text-gray-900 dark:text-gray-300">
-                                                            {srv.service_name}
+                                                            {srv.service_name || 'Unnamed Service'}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -550,6 +549,10 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                             <ChevronRight className="h-4 w-4" />
                                         </Button>
                                     </div>
+                                </div>
+                            ) : (
+                                <div className="mt-10 text-center text-gray-500">
+                                    No services selected for this booking.
                                 </div>
                             )}
                         </AccordionContent>
@@ -583,7 +586,7 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                                             className="flex cursor-pointer items-center gap-3 p-1 underline hover:text-green-600"
                                                         >
                                                             <ThumbsUp className="text-green-600" />
-                                                            <span className="max-sm:sr-only">Accept Booking</span>
+                                                            <span className="max-sm:sr-only"><strong>Accept Booking</strong></span>
                                                         </Button>
                                                     </DialogTrigger>
 
@@ -641,7 +644,7 @@ function BookingAccordion({ bookings, confirmDelete }: { bookings: BookingType[]
                                                         className="flex cursor-pointer items-center gap-3 p-1 underline hover:text-red-600"
                                                     >
                                                         <MessageSquareX className="text-red-500" />
-                                                        <span className="max-sm:sr-only">Decline</span>
+                                                        <span className="max-sm:sr-only"><strong>Decline</strong></span>
                                                     </Button>
                                                 </DialogTrigger>
 

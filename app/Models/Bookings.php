@@ -10,7 +10,7 @@ class Bookings extends Model
 {
     use Notifiable;
     use SoftDeletes;
-    
+
     protected $table = 'event_bookings';
     protected $primaryKey = 'booking_id';
     public $incrementing = true;
@@ -96,5 +96,10 @@ class Bookings extends Model
     {
         return $this->hasMany(AssignedStaff::class, 'booking_id', 'booking_id')
             ->where('booking_type', 'event');
+    }
+
+    public function bookingSelectedServices()
+    {
+        return $this->hasMany(BookingSelectedServices::class, 'booking_id', 'booking_id');
     }
 }

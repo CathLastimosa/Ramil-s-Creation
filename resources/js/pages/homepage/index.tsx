@@ -72,16 +72,10 @@ const Homepage = () => {
         <>
             <Head title="Homepage" />
             <Preloader />
-            {/* <div className="my-6 text-center">
-                <Button onClick={() => router.get(route('booking.track'))} className="bg-pink-600 text-white hover:bg-pink-700">
-                    Track Your Booking Here!
-                </Button>
-            </div> */}
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent className="max-w-md overflow-visible">
                     {bookingData?.booking && (
                         <div className="relative flex flex-col items-center text-center">
-                            {/* ✅ Floating Check Icon */}
                             <motion.div
                                 initial={{ scale: 0, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
@@ -129,7 +123,6 @@ const Homepage = () => {
 
                     {bookingData?.feedback && (
                         <div className="relative flex flex-col items-center text-center">
-                            {/* ✅ Floating Check Icon */}
                             <motion.div
                                 initial={{ scale: 0, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}

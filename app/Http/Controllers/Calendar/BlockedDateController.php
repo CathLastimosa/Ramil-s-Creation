@@ -29,6 +29,30 @@ class BlockedDateController extends Controller
 
         return response()->json($blocked);
     }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $blockedDate)
+    {
+        $data = $request->validate([
+            'date' => 'required|date',
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i',
+            'reason' => 'nullable|string',
+        ]);
+
+        $blocked = BlockedDate::findOrFail($blockedDate);
+
+        $blocked->update([
+            'date' => $data['date'],
+            'start_time' => $data['start_time'] ?? null,
+            'end_time' => $data['end_time'] ?? null,
+            'reason' => $data['reason'] ?? null,
+        ]);
+
+        return response()->json($blocked);
+    }
     
     /**
      * Remove the specified resource from storage.

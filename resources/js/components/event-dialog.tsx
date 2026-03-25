@@ -43,6 +43,8 @@ interface EventDialogProps {
     forceSource?: 'booking' | 'appointment';
     appointmentTimes?: Record<string, AppointmentTime[]>;
     blockedtimes?: Record<string, BlockedTime[]>;
+    bookedTimes?: Record<string, { from: string; to: string; status: string }[]>;
+    servicebookingtimes?: Record<string, { from: string; to: string }[]>;
 }
 
 export function EventDialog({
@@ -56,6 +58,8 @@ export function EventDialog({
     forceSource,
     appointmentTimes,
     blockedtimes,
+    bookedTimes,
+    servicebookingtimes,
 }: EventDialogProps) {
     // Generic field,s (kept for generic events only)
     const [title, setTitle] = useState('');

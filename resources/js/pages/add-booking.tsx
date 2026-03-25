@@ -9,8 +9,8 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Calendar } from '@/components/ui/shadcn-calendar';
 import { Textarea } from '@/components/ui/textarea';
-import { router, useForm, usePage } from '@inertiajs/react';
-import { Box } from '@mui/material';
+import AppLayout from '@/layouts/app-layout';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import React, { useEffect, useId, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -27,11 +27,6 @@ import {
     UserIcon,
     UsersIcon,
 } from 'lucide-react';
-
-const breadcrumbs = [
-    { title: 'Bookings', href: '/admin-booking' },
-    { title: 'Add New Booking', href: '/' },
-];
 
 interface BookingTime {
     from: string;
@@ -83,16 +78,12 @@ export default function BookingForm() {
     }>().props;
 
     const { bookedTimes = {}, blockedtimes = {}, servicebookingtimes = {} } = usePage<PageProps>().props;
-
-    // State hooks
     const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
     const [relatedServices, setRelatedServices] = useState<ServiceProps[]>(initialServices);
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
     const [date, setDate] = useState<Date | undefined>();
     const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
     const [paymentMethod, setPaymentMethod] = useState('1');
-
-    // Form state managed by Inertia useForm
     const { data, setData, post, processing, errors } = useForm({
         service: '',
         datetime: '',
@@ -124,7 +115,6 @@ export default function BookingForm() {
         { label: 'Short-Day Event', from: '19:00', to: '20:00' },
     ];
 
-    // Utility: Convert 24h time to 12h format
     const formatTo12Hour = (time24: string) => {
         let [hour, minute] = time24.split(':').map(Number);
         const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -132,7 +122,6 @@ export default function BookingForm() {
         return `${hour}:${minute.toString().padStart(2, '0')} ${ampm}`;
     };
 
-    // Utility: Format Date object to yyyy-mm-dd string
     function formatLocalDate(date: Date) {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -140,7 +129,6 @@ export default function BookingForm() {
         return `${year}-${month}-${day}`;
     }
 
-    // Update datetime in form data when date or slot changes
     useEffect(() => {
         if (date && selectedSlot !== null) {
             const slot = bookingSlots[selectedSlot];
@@ -148,13 +136,11 @@ export default function BookingForm() {
         }
     }, [date, selectedSlot]);
 
-    // Reset selected slot and datetime when date changes
     useEffect(() => {
         setSelectedSlot(null);
         setData('datetime', '');
     }, [date]);
 
-    // Handle package selection and fetch related services
     const handlePackageClick = (packageId: string) => {
         setSelectedPackage(packageId);
         router.get(
@@ -176,7 +162,6 @@ export default function BookingForm() {
 
     const [readyToPost, setReadyToPost] = useState(false);
 
-    // Form submission handler with validation
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setData((prev) => ({
@@ -216,13 +201,10 @@ export default function BookingForm() {
     };
 
     return (
-        <div className="flex h-full flex-1 flex-col gap-4">
-            <CardTitle>Add New Booking</CardTitle>
-            <CardDescription>You can add bookings here.</CardDescription>
-
-            <Box>
+        <AppLayout>
+            <Head title="Add New Booking" />
+            <div className="space-y-6">
                 <form id="bookingForm" onSubmit={handleSubmit}>
-                    {/* Package Selection */}
                     <ul className="mb-6 flex justify-start gap-10">
                         {packages && packages.length > 0 ? (
                             packages.map((pkg) => {
@@ -286,20 +268,6 @@ export default function BookingForm() {
                                                 />
                                             </div>
                                             <CardTitle className="mt-8">{service.service_name}</CardTitle>
-                                            {/* Uncomment if images are needed
-                        {service.image ? (
-                          <img
-                            src={`/storage/${service.image}`}
-                            alt={service.service_name}
-                            className="mx-auto my-2 h-24 object-contain"
-                          />
-                        ) : (
-                          <img
-                            src="/default-image.png"
-                            alt="No image available"
-                            className="mx-auto my-2 h-24 object-contain"
-                          />
-                        )} */}
                                             <CardDescription className="text-gray-600">{service.description}</CardDescription>
                                         </Card>
                                     );
@@ -640,7 +608,7 @@ export default function BookingForm() {
                         </div>
                     </RadioGroup>
 
-                    <div className="flex itemscenter justify-end gap-2">
+                    <div className="itemscenter flex justify-end gap-2">
                         <Button type="button" variant="secondary" onClick={() => window.history.back()}>
                             Cancel
                         </Button>
@@ -651,7 +619,7 @@ export default function BookingForm() {
                         </Button>
                     </div>
                 </form>
-            </Box>
-        </div>
+            </div>
+        </AppLayout>
     );
 }

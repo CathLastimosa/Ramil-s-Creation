@@ -10,7 +10,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, router, usePage } from '@inertiajs/react';
 import { CardContent } from '@mui/material';
 import debounce from 'lodash/debounce';
-import { CalendarCheck, CheckIcon, LucidePlus, Mail, Pencil, Phone, PlusIcon, Search, Trash } from 'lucide-react';
+import { CalendarCheck, CheckIcon, CircleDotDashed, LucidePlus, Mail, Pencil, Phone, PlusIcon, Search, Trash } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
@@ -180,24 +180,15 @@ function AppointmentAccordion({ appointments, confirmDelete }: { appointments: A
                                 <span className="font-semibold text-gray-900">{appointment.purpose}</span>
                                 <Badge
                                     variant="outline"
-                                    className={`gap-1.5 rounded-full border-0 px-2.5 py-1 text-xs font-medium capitalize ${
-                                        appointment.status === 'pending'
-                                            ? 'bg-yellow-100 text-yellow-700'
-                                            : appointment.status === 'completed'
-                                              ? 'bg-emerald-100 text-emerald-700'
-                                              : appointment.status === 'cancelled'
-                                                ? 'bg-red-100 text-red-700'
-                                                : 'bg-blue-100 text-blue-700'
-                                    } `}
+                                    className={`gap-1.5 rounded-full border-0 px-2.5 py-1 text-xs font-medium capitalize ${appointment.status === 'completed'
+                                        ? 'bg-emerald-100 text-emerald-700'
+                                        : 'bg-blue-100 text-blue-700'
+                                        } `}
                                 >
-                                    {appointment.status === 'pending' ? (
-                                        <span className="size-1.5 rounded-full bg-yellow-500" aria-hidden="true"></span>
-                                    ) : appointment.status === 'completed' ? (
+                                    {appointment.status === 'completed' ? (
                                         <CheckIcon className="text-emerald-500" size={12} aria-hidden="true" />
-                                    ) : appointment.status === 'cancelled' ? (
-                                        <span className="size-1.5 rounded-full bg-red-500" aria-hidden="true"></span>
                                     ) : (
-                                        <span className="size-1.5 rounded-full bg-blue-500" aria-hidden="true"></span>
+                                        <CircleDotDashed className="text-blue-600" size={12} aria-hidden="true" />
                                     )}
                                     {appointment.status}
                                 </Badge>
@@ -212,7 +203,7 @@ function AppointmentAccordion({ appointments, confirmDelete }: { appointments: A
                         </div>
                     </AccordionTrigger>
 
-                    <AccordionContent className="bg-gray-50/70 p-4 sm:px-6 sm:py-4 dark:from-black dark:to-black">
+                    <AccordionContent className="bg-gray-50/70 p-4 sm:px-6 sm:py-4">
                         <Card className="overflow-hidden border border-gray-200/70 shadow-sm transition-shadow duration-300 hover:shadow-md">
                             <CardHeader className="flex items-center gap-2 border-b border-gray-200 bg-gray-50/70 px-6 py-4">
                                 <CalendarCheck className="h-5 w-5 text-purple-600" />

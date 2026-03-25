@@ -27,7 +27,7 @@ const steps = [
 ];
 
 export default function TrackingPage() {
-    const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
+    const { flash, errors } = usePage<{ flash: { success?: string; error?: string }; errors: { transaction_number?: string } }>().props;
 
     useEffect(() => {
         if (flash.success) toast.success(flash.success);
@@ -74,14 +74,15 @@ export default function TrackingPage() {
                 recaptchaRef.current?.reset();
                 setCaptchaToken(null);
             },
-            onError: () => {
+            onError: (errors: any) => {
+                if (errors.transaction_number) {
+                    toast.error(errors.transaction_number);
+                }
                 recaptchaRef.current?.reset();
                 setCaptchaToken(null);
             },
         });
     };
-
-
 
     const handleMessageSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -130,6 +131,9 @@ export default function TrackingPage() {
                                     Track
                                 </button>
                             </div>
+                            {errors.transaction_number && (
+                                <p className="mt-2 text-center text-red-500">{errors.transaction_number}</p>
+                            )}
                             {data.transaction_number.trim() && (
                                 <div className="mt-4 flex flex-col items-center gap-2">
                                     <p className="text-sm text-gray-600">Security Check</p>

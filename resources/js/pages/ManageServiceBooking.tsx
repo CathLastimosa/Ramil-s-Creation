@@ -16,6 +16,7 @@ import {
     BanknoteIcon,
     CalendarClock,
     CheckIcon,
+    CircleDotDashed,
     Clock,
     FileText,
     LoaderIcon,
@@ -179,7 +180,7 @@ function ServiceBookingAccordion({
         const [hoursStr, minutes] = time.split(':');
         let hours = parseInt(hoursStr, 10);
         const suffix = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12 || 12; // convert 0 -> 12
+        hours = hours % 12 || 12;
         return `${hours}:${minutes} ${suffix}`;
     }
 
@@ -238,24 +239,15 @@ function ServiceBookingAccordion({
                                     </div>
                                     <Badge
                                         variant="outline"
-                                        className={`gap-1.5 rounded-full border-0 px-2.5 py-1 text-xs font-medium capitalize ${
-                                            booking.status === 'pending'
-                                                ? 'bg-yellow-100 text-yellow-700'
-                                                : booking.status === 'completed'
-                                                  ? 'bg-emerald-100 text-emerald-700'
-                                                  : booking.status === 'cancelled'
-                                                    ? 'bg-red-100 text-red-700'
-                                                    : 'bg-blue-100 text-blue-700'
-                                        } `}
+                                        className={`gap-1.5 rounded-full border-0 px-2.5 py-1 text-xs font-medium capitalize ${booking.status === 'completed'
+                                            ? 'bg-emerald-100 text-emerald-700'
+                                            : 'bg-blue-100 text-blue-700'
+                                            } `}
                                     >
-                                        {booking.status === 'pending' ? (
-                                            <span className="size-1.5 rounded-full bg-yellow-500" aria-hidden="true"></span>
-                                        ) : booking.status === 'completed' ? (
+                                        {booking.status === 'completed' ? (
                                             <CheckIcon className="text-emerald-500" size={12} aria-hidden="true" />
-                                        ) : booking.status === 'cancelled' ? (
-                                            <span className="size-1.5 rounded-full bg-red-500" aria-hidden="true"></span>
                                         ) : (
-                                            <span className="size-1.5 rounded-full bg-blue-500" aria-hidden="true"></span>
+                                            <CircleDotDashed className="text-blue-600" size={12} aria-hidden="true" />
                                         )}
                                         {booking.status}
                                     </Badge>
@@ -264,7 +256,7 @@ function ServiceBookingAccordion({
                                     <span className="rounded-xl bg-violet-200 px-3 py-3 text-sm font-medium text-violet-900">
                                         {formatDateToWords(booking.date)}
                                         <span className="text-violet-300"> | </span>
-                                        {formatTimeTo12Hour(booking.start_time)}
+                                        {formatTimeTo12Hour(booking.start_time)} - {formatTimeTo12Hour(booking.end_time)}
                                     </span>
                                 </div>
                             </div>
@@ -272,7 +264,6 @@ function ServiceBookingAccordion({
 
                         <AccordionContent className="rounded-b-xl bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-8 dark:from-black dark:to-black">
                             <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
-                                {/* --- Left: Service Booking Details --- */}
                                 <Card className="overflow-hidden border border-gray-200/70 shadow-sm transition-shadow duration-300 hover:shadow-md">
                                     <CardHeader className="flex items-center gap-2 border-b border-gray-200 bg-gray-50/70 px-6 py-4">
                                         <FileText className="h-5 w-5 text-indigo-600" />
@@ -280,7 +271,6 @@ function ServiceBookingAccordion({
                                     </CardHeader>
 
                                     <CardContent className="space-y-4 p-6 text-sm text-gray-700">
-                                        {/* Description */}
                                         <div className="flex items-start justify-between border-b border-gray-100 pb-2">
                                             <span className="flex items-center gap-2 text-gray-600">
                                                 <FileText size={16} /> Description
@@ -288,7 +278,6 @@ function ServiceBookingAccordion({
                                             <span className="max-w-[60%] text-right font-medium text-gray-900">{booking.description || '—'}</span>
                                         </div>
 
-                                        {/* Comment */}
                                         <div className="flex items-start justify-between border-b border-gray-100 pb-2">
                                             <span className="flex items-center gap-2 text-gray-600">
                                                 <MessageSquare size={16} /> Comment
@@ -296,7 +285,6 @@ function ServiceBookingAccordion({
                                             <span className="max-w-[60%] text-right font-medium text-gray-900">{booking.comment || '—'}</span>
                                         </div>
 
-                                        {/* Return Date */}
                                         <div className="flex items-center justify-between border-b border-gray-100 pb-2">
                                             <span className="flex items-center gap-2 text-gray-600">
                                                 <CalendarClock size={16} /> Return Date
@@ -306,7 +294,6 @@ function ServiceBookingAccordion({
                                             </span>
                                         </div>
 
-                                        {/* End Time */}
                                         <div className="flex items-center justify-between">
                                             <span className="flex items-center gap-2 text-gray-600">
                                                 <Clock size={16} /> End Time
@@ -316,7 +303,6 @@ function ServiceBookingAccordion({
                                     </CardContent>
                                 </Card>
 
-                                {/* --- Right: Payment Information --- */}
                                 <Card className="overflow-hidden border border-gray-200/70 shadow-sm transition-shadow duration-300 hover:shadow-md">
                                     <CardHeader className="flex items-center gap-2 border-b border-gray-200 bg-gray-50/70 px-6 py-4">
                                         <Wallet className="h-5 w-5 text-green-600" />
@@ -324,7 +310,6 @@ function ServiceBookingAccordion({
                                     </CardHeader>
 
                                     <CardContent className="space-y-4 p-6 text-sm text-gray-700">
-                                        {/* Total Amount */}
                                         <div className="flex items-center justify-between border-b border-gray-100 pb-2">
                                             <span className="text-gray-500">Total Amount</span>
                                             <span className="font-semibold text-gray-900">
@@ -332,7 +317,6 @@ function ServiceBookingAccordion({
                                             </span>
                                         </div>
 
-                                        {/* Paid Amount */}
                                         <div className="flex items-center justify-between">
                                             <span className="text-gray-500">Paid Amount</span>
                                             <span className="font-semibold text-green-600">
@@ -340,13 +324,11 @@ function ServiceBookingAccordion({
                                             </span>
                                         </div>
 
-                                        {/* Payment Status */}
                                         <div
-                                            className={`mt-4 rounded-lg px-3 py-2 text-sm ${
-                                                Number(booking.paid_amount) >= Number(booking.total_amount)
-                                                    ? 'bg-green-50 text-green-700'
-                                                    : 'bg-yellow-50 text-yellow-700'
-                                            }`}
+                                            className={`mt-4 rounded-lg px-3 py-2 text-sm ${Number(booking.paid_amount) >= Number(booking.total_amount)
+                                                ? 'bg-green-50 text-green-700'
+                                                : 'bg-yellow-50 text-yellow-700'
+                                                }`}
                                         >
                                             {Number(booking.paid_amount) >= Number(booking.total_amount)
                                                 ? '✅ Fully Paid'

@@ -15,9 +15,31 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import debounce from 'lodash/debounce';
-import { Ban, CheckCircle, Eye, LucidePlus, Mail, Pencil, Phone, Plus, Search, Trash2, UserPlus } from 'lucide-react';
+import { Ban, CheckCircle, CircleDotDashed, Eye, Hourglass, LucidePlus, Mail, Pencil, Phone, Plus, Search, Trash2, UserPlus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+
+// Helper function to format date
+const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+};
+
+// Helper function to format time to 12-hour format with AM/PM
+const formatTime = (timeString: string) => {
+    const [time, period] = timeString.split(' ');
+    const [hours, minutes] = time.split(':');
+    let hour = parseInt(hours, 10);
+    const minute = minutes || '00';
+    const ampm = period || (hour >= 12 ? 'PM' : 'AM');
+    if (hour > 12) hour -= 12;
+    if (hour === 0) hour = 12;
+    return `${hour}:${minute} ${ampm}`;
+};
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Staff', href: 'staff' }];
 
@@ -181,8 +203,8 @@ export default function Staff({ staff }: { staff: StaffType[] }) {
             onSuccess: () => {
                 reset();
                 setBlockedDays(new Set());
-                setUseBusinessHours(true); // Reset to default
-                router.reload({ only: ['staff'] }); // Refresh staff list
+                setUseBusinessHours(true);
+                router.reload({ only: ['staff'] });
             },
             onError: () => toast.error('Failed to save staff'),
         });
@@ -215,7 +237,6 @@ export default function Staff({ staff }: { staff: StaffType[] }) {
                             </Button>
                         </SheetTrigger>
 
-                        {/* 🗂 Sheet Content */}
                         <SheetContent side="right" className="w-[440px] overflow-y-auto rounded-l-2xl bg-white p-6 shadow-xl sm:w-[500px]">
                             <form onSubmit={saveStaff}>
                                 {/* Header */}
@@ -232,7 +253,6 @@ export default function Staff({ staff }: { staff: StaffType[] }) {
 
                                 {/* Body */}
                                 <div className="space-y-6">
-                                    {/* 🧾 Personal Info */}
                                     <div>
                                         <p className="mb-3 text-sm font-semibold text-gray-700">Basic Information</p>
                                         <div className="space-y-4">
@@ -303,7 +323,6 @@ export default function Staff({ staff }: { staff: StaffType[] }) {
                                         </div>
                                     </div>
 
-                                    {/* 🎨 Color */}
                                     <div>
                                         <p className="mb-3 text-sm font-semibold text-gray-700">Staff Color Tag</p>
                                         <div className="flex items-center gap-3">
@@ -337,9 +356,8 @@ export default function Staff({ staff }: { staff: StaffType[] }) {
                                         </div>
 
                                         <div
-                                            className={`mt-3 space-y-2 transition-opacity duration-200 ${
-                                                useBusinessHours ? 'pointer-events-none opacity-50' : ''
-                                            }`}
+                                            className={`mt-3 space-y-2 transition-opacity duration-200 ${useBusinessHours ? 'pointer-events-none opacity-50' : ''
+                                                }`}
                                         >
                                             <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 border-b pb-1 text-xs font-semibold text-gray-500 uppercase">
                                                 <span>Day</span>
@@ -426,7 +444,12 @@ export default function Staff({ staff }: { staff: StaffType[] }) {
 
                                 {/* Footer */}
                                 <div className="mt-6 flex gap-3 border-t pt-4">
-                                    <Button type="button" variant="secondary" className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100">
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100"
+                                        onClick={() => setIsSheetOpen(false)}
+                                    >
                                         Cancel
                                     </Button>
                                     <Button type="submit" className="flex-1" disabled={processing}>
@@ -438,7 +461,6 @@ export default function Staff({ staff }: { staff: StaffType[] }) {
                     </Sheet>
                 </div>
 
-                {/* Staff Table */}
                 <div className="overflow-x-auto">
                     <Table>
                         <TableHeader>
@@ -474,15 +496,23 @@ export default function Staff({ staff }: { staff: StaffType[] }) {
                                         <TableCell>
                                             <Badge
                                                 variant="outline"
-                                                className={`gap-1.5 border-0 px-2.5 py-1 text-xs font-medium capitalize ${
-                                                    member.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                                                }`}
+                                                className={`gap-1.5 border-0 px-2.5 py-1 text-xs font-medium capitalize ${member.status === 'active'
+                                                    ? 'bg-green-100 text-green-700'
+                                                    : member.status === 'on_duty'
+                                                        ? 'bg-blue-100 text-blue-700'
+                                                        : 'bg-red-100 text-red-700'
+                                                    }`}
                                             >
                                                 <span
-                                                    className={`size-1.5 rounded-full ${member.status === 'active' ? 'bg-green-500' : 'bg-red-500'}`}
+                                                    className={`size-1.5 rounded-full ${member.status === 'active'
+                                                        ? 'bg-green-500'
+                                                        : member.status === 'on_duty'
+                                                            ? 'bg-blue-500'
+                                                            : 'bg-red-500'
+                                                        }`}
                                                     aria-hidden="true"
                                                 ></span>
-                                                {member.status.charAt(0).toUpperCase() + member.status.slice(1)}
+                                                {member.status === 'on_duty' ? 'On Duty' : member.status.charAt(0).toUpperCase() + member.status.slice(1)}
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="flex space-x-3">
@@ -543,7 +573,6 @@ export default function Staff({ staff }: { staff: StaffType[] }) {
                     </Table>
                 </div>
 
-                {/* View Staff Dialog */}
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
@@ -576,10 +605,12 @@ export default function Staff({ staff }: { staff: StaffType[] }) {
                                         <Badge variant="outline" className="gap-1.5">
                                             {selectedStaff.status === 'active' ? (
                                                 <span className="size-1.5 rounded-full bg-green-500" aria-hidden="true"></span>
+                                            ) : selectedStaff.status === 'on_duty' ? (
+                                                <span className="size-1.5 rounded-full bg-blue-500" aria-hidden="true"></span>
                                             ) : (
                                                 <span className="size-1.5 rounded-full bg-red-500" aria-hidden="true"></span>
                                             )}
-                                            {selectedStaff.status}
+                                            {selectedStaff.status === 'on_duty' ? 'On Duty' : selectedStaff.status}
                                         </Badge>
                                     </div>
                                 </div>
@@ -605,12 +636,12 @@ export default function Staff({ staff }: { staff: StaffType[] }) {
                                                         <span
                                                             className={`text-center text-xs ${isBlocked ? 'text-muted-foreground line-through' : ''}`}
                                                         >
-                                                            {avail.start_time || 'N/A'}
+                                                            {avail.start_time ? formatTime(avail.start_time) : 'N/A'}
                                                         </span>
                                                         <span
                                                             className={`text-center text-xs ${isBlocked ? 'text-muted-foreground line-through' : ''}`}
                                                         >
-                                                            {avail.end_time || 'N/A'}
+                                                            {avail.end_time ? formatTime(avail.end_time) : 'N/A'}
                                                         </span>
                                                         <span
                                                             className={`text-center text-xs ${isBlocked ? 'text-destructive' : 'text-emerald-500'}`}
@@ -633,10 +664,30 @@ export default function Staff({ staff }: { staff: StaffType[] }) {
                                                     <div>
                                                         <p className="text-sm font-medium">{booking.event_name}</p>
                                                         <p className="text-xs text-muted-foreground">
-                                                            {booking.event_date} - {booking.transaction_number}
+                                                            {formatDate(booking.event_date)}
+                                                            <p className='mt-2'>{booking.transaction_number}</p>
                                                         </p>
                                                     </div>
-                                                    <Badge variant="outline" className="text-xs">
+                                                    <Badge
+                                                        variant="outline"
+                                                        className={`gap-1.5 rounded-full border-0 px-2.5 py-1 text-xs font-medium capitalize ${booking.status === 'pending'
+                                                            ? 'bg-yellow-100 text-yellow-700'
+                                                            : booking.status === 'completed'
+                                                                ? 'bg-emerald-100 text-emerald-700'
+                                                                : booking.status === 'cancelled'
+                                                                    ? 'bg-red-100 text-red-700'
+                                                                    : 'bg-blue-100 text-blue-700'
+                                                            } `}
+                                                    >
+                                                        {booking.status === 'pending' ? (
+                                                            <Hourglass className="text-yellow-600" size={12} aria-hidden="true" />
+                                                        ) : booking.status === 'completed' ? (
+                                                            <CheckCircle className="text-emerald-500" size={12} aria-hidden="true" />
+                                                        ) : booking.status === 'cancelled' ? (
+                                                            <Ban className="text-red-600" size={12} aria-hidden="true" />
+                                                        ) : (
+                                                            <CircleDotDashed className="text-blue-600" size={12} aria-hidden="true" />
+                                                        )}
                                                         {booking.status}
                                                     </Badge>
                                                 </div>
@@ -657,10 +708,30 @@ export default function Staff({ staff }: { staff: StaffType[] }) {
                                                     <div>
                                                         <p className="text-sm font-medium">{serviceBooking.title}</p>
                                                         <p className="text-xs text-muted-foreground">
-                                                            {serviceBooking.service_name} - {serviceBooking.date}
+                                                            {serviceBooking.service_name}
+                                                            <p className='mt-2'>{formatDate(serviceBooking.date)}</p>
                                                         </p>
                                                     </div>
-                                                    <Badge variant="outline" className="text-xs">
+                                                    <Badge
+                                                        variant="outline"
+                                                        className={`gap-1.5 rounded-full border-0 px-2.5 py-1 text-xs font-medium capitalize ${serviceBooking.status === 'pending'
+                                                            ? 'bg-yellow-100 text-yellow-700'
+                                                            : serviceBooking.status === 'completed'
+                                                                ? 'bg-emerald-100 text-emerald-700'
+                                                                : serviceBooking.status === 'cancelled'
+                                                                    ? 'bg-red-100 text-red-700'
+                                                                    : 'bg-blue-100 text-blue-700'
+                                                            } `}
+                                                    >
+                                                        {serviceBooking.status === 'pending' ? (
+                                                            <Hourglass className="text-yellow-600" size={12} aria-hidden="true" />
+                                                        ) : serviceBooking.status === 'completed' ? (
+                                                            <CheckCircle className="text-emerald-500" size={12} aria-hidden="true" />
+                                                        ) : serviceBooking.status === 'cancelled' ? (
+                                                            <Ban className="text-red-600" size={12} aria-hidden="true" />
+                                                        ) : (
+                                                            <CircleDotDashed className="text-blue-600" size={12} aria-hidden="true" />
+                                                        )}
                                                         {serviceBooking.status}
                                                     </Badge>
                                                 </div>

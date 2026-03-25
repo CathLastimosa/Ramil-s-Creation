@@ -17,7 +17,7 @@ class EditServicesController extends Controller
     {
         $request->validate([
             'service_name' => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
         ]);
 
@@ -58,7 +58,7 @@ class EditServicesController extends Controller
 
         $request->validate([
             'service_name' => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
         ]);
 

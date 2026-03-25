@@ -181,7 +181,7 @@ export function printBookings(bookings: BookingType[]) {
 <body>
     <header>
         <div class="brand">
-            <img src="http://localhost:8000/storage/logo.png" alt="Ramil's Creation Logo">
+            <img src="/storage/logo.png" alt="Ramil's Creation Logo">
             <h2>Ramil's Creation</h2>
         </div>
         <div class="report-info">
@@ -408,7 +408,7 @@ export function printServiceBookings(serviceBookings: ServiceBookingType[]) {
 <body>
     <header>
         <div class="brand">
-            <img src="http://localhost:8000/storage/logo.png" alt="Ramil's Creation Logo">
+            <img src="/storage/logo.png" alt="Ramil's Creation Logo">
             <h2>Ramil's Creation</h2>
         </div>
         <div class="report-info">
@@ -482,29 +482,23 @@ export function printServiceBookings(serviceBookings: ServiceBookingType[]) {
 </html>
 `;
 
-    // Create blob and object URL for new tab
     const blob = new Blob([htmlContent], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
 
-    // Open in new tab (no features = no pop-up blocker trigger)
     const printWindow = window.open(url, '_blank');
 
     if (!printWindow) {
-        // Rare fallback if open fails
         URL.revokeObjectURL(url);
         alert('Unable to open print tab. Please use Ctrl+P (Cmd+P on Mac) to print this page.');
-        window.print(); // Fallback to current window print
+        window.print();
         return;
     }
 
-    // Focus the tab and clean up URL after a delay
     printWindow.focus();
-    setTimeout(() => URL.revokeObjectURL(url), 1000); // Free memory after open
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-// Function to print appointments report (opens in new tab, no pop-up blocker issues)
 export function printAppointments(appointments: AppointmentType[]) {
-    // Generate full HTML content
     const htmlContent = `
 <!DOCTYPE html>
 <html>
@@ -580,7 +574,7 @@ export function printAppointments(appointments: AppointmentType[]) {
 </head>
 <body>
     <header>
-        <img src="http://localhost:8000/storage/logo.png" alt="Ramil's Creation Logo">
+        <img src="/storage/logo.png" alt="Ramil's Creation Logo">
         <h1>Ramil's Creation</h1>
         <h2 style="font-size:18px; color:#444; margin-top:5px;">Appointments Report</h2>
     </header>

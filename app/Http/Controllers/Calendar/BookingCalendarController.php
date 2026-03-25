@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\AssignedStaff;
 use App\Models\BookingSelectedServices;
+use App\Models\Services;
 use App\Models\Staff;
 use App\Models\StaffAvailability;
 use App\Notifications\AssignedStaffBooking;
@@ -102,12 +103,21 @@ class BookingCalendarController extends Controller
         $transactionNumber = 'RAMILS-' . $datePart . '-' . str_pad($booking->booking_id, 4, '0', STR_PAD_LEFT);
         $booking->update(['transaction_number' => $transactionNumber]);
 
-        // Save selected services
+        // Save selected services with snapshots
         foreach ($validated['selected_services'] as $services_id) {
+            $service = Services::find($services_id);
             BookingSelectedServices::create([
                 'package_id' => $validated['package_id'],
                 'services_id' => $services_id,
                 'booking_id' => $booking->booking_id,
+                'package_name' => $package->package_name,
+                'package_description' => $package->package_description,
+                'package_price' => $package->package_price,
+                'package_promo' => $package->package_promo,
+                'discounted_price' => $package->discounted_price,
+                'service_name' => $service->service_name,
+                'service_description' => $service->service_description,
+                'service_image' => $service->image,
             ]);
         }
 

@@ -16,7 +16,6 @@ import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Messages', href: '/messages' }];
 
-// Define types for clarity and type safety
 type Message = {
     message_id: number;
     receiver_id: number;
@@ -51,36 +50,27 @@ type ReceiverGroup = {
 };
 
 export default function Messages() {
-    // Extract props from Inertia page
     const { flash, messages: rawMessages = [] } = usePage<{
         flash: { success?: string; error?: string };
         messages?: Message[];
     }>().props;
 
-    // Ensure messages is always an array (defensive programming)
     const messages = Array.isArray(rawMessages) ? rawMessages : [];
-    console.log('Loaded messages:', messages); // Debug: Log messages for inspection
 
-    // State for search and filter
     const [searchQuery, setSearchQuery] = useState('');
     const [filter, setFilter] = useState<'inbox' | 'sent'>('inbox');
 
-    // Filter messages based on inbox/sent
     const filteredMessages = useMemo(() => {
         if (!messages || messages.length === 0) {
-            console.log('No messages to filter'); // Debug
             return [];
         }
         if (filter === 'sent') {
-            // Sent: Messages where sender is the current user (App\Models\User)
             return messages.filter((m) => m.sender_type === 'App\\Models\\User');
         } else {
-            // Inbox: Messages where sender is NOT the current user (e.g., bookings, staff)
             return messages.filter((m) => m.sender_type !== 'App\\Models\\User');
         }
     }, [messages, filter]);
 
-    // Helper function to create a group for inbox (groups by sender_id for uniqueness)
     const createInboxGroup = (msg: Message): ReceiverGroup | null => {
         const senderType = msg.sender_type?.replace(/\\\\/g, '\\') || '';
         let groupId = '';
@@ -90,14 +80,12 @@ export default function Messages() {
         let icon = <User className="h-4 w-4" />;
 
         if (senderType === 'App\\Models\\Bookings' || senderType === 'App\Models\\Bookings') {
-            // Key requirement: Group by sender_id (unique per customer/booking), not name/email
             groupId = `booking-${msg.sender_id}`;
             name = msg.sender?.name || `Customer #${msg.sender_id}`;
             subtitle = msg.sender?.event_name || 'Event Booking';
             type = 'booking';
             icon = <User className="text-gold-600 h-4 w-4" />;
         } else {
-            // For other sender types (e.g., staff), still use sender_id for uniqueness
             groupId = `${senderType}-${msg.sender_id}`;
             name = msg.sender?.name || msg.sender?.email || 'Unknown Sender';
             subtitle = msg.sender?.event_name || 'No Info';
@@ -108,7 +96,6 @@ export default function Messages() {
         return { id: groupId, type, name, subtitle, icon, messages: [msg] };
     };
 
-    // Helper function to create a group for sent (groups by receiver)
     const createSentGroup = (msg: Message): ReceiverGroup | null => {
         const receiver = msg.receiver;
         if (!receiver) {
@@ -145,10 +132,8 @@ export default function Messages() {
         return { id: groupId, type, name, subtitle, icon, messages: [msg] };
     };
 
-    // Group messages into ReceiverGroups
     const receiverGroups = useMemo(() => {
         if (!filteredMessages || filteredMessages.length === 0) {
-            console.log('No filtered messages to group'); // Debug
             return [];
         }
 
@@ -166,13 +151,11 @@ export default function Messages() {
                 if (!groups[group.id]) {
                     groups[group.id] = group;
                 } else {
-                    // Add message to existing group
                     groups[group.id].messages.push(msg);
                 }
             }
         });
 
-        // Sort groups by the latest message's timestamp (newest first)
         const sortedGroups = Object.values(groups).sort((a, b) => {
             const aLatest = a.messages.reduce(
                 (latest, msg) => (new Date(msg.created_at) > new Date(latest.created_at) ? msg : latest),
@@ -189,7 +172,6 @@ export default function Messages() {
         return sortedGroups;
     }, [filteredMessages, filter]);
 
-    // Filter groups based on search query
     const filteredGroups = useMemo(() => {
         if (!receiverGroups || receiverGroups.length === 0) return [];
         if (!searchQuery) return receiverGroups;
@@ -206,20 +188,16 @@ export default function Messages() {
         );
     }, [receiverGroups, searchQuery]);
 
-    // Default tab: First group's ID or empty string
     const defaultTab = filteredGroups[0]?.id || '';
 
-    // Handle message deletion
     const handleDeleteMessage = (messageId: number) => {
         if (confirm('Are you sure you want to delete this message?')) {
             router.delete(route('messages.destroy', messageId), {
-                onSuccess: () => toast.success('Message deleted successfully.'),
                 onError: () => toast.error('Failed to delete message.'),
             });
         }
     };
 
-    // Debounced search handler
     const handleSearch = useRef(
         debounce((query: string) => {
             router.get(route('messages.index'), { search: query }, { preserveState: true, replace: true });
@@ -265,7 +243,7 @@ export default function Messages() {
                     className="flex w-full items-center justify-center gap-1 sm:w-auto"
                     onClick={() => router.visit(route('messages.create'))}
                 >
-                    <SquarePen className="mr-2 h-4 w-4" />
+                    <Send className="h-4 w-4" />
                     Send Message via Email
                 </Button>
             </div>
@@ -287,7 +265,6 @@ export default function Messages() {
                     <div className="grid h-full grid-cols-1 md:grid-cols-[320px_1fr]">
                         <TabsList className="border-gray max-h-full w-full flex-col justify-start gap-2 overflow-y-auto border-r bg-transparent px-3 py-2 md:w-[320px]">
                             {filteredGroups.map((group) => {
-                                // Find the latest message in the group
                                 const latestMessage = group.messages.reduce(
                                     (latest, current) => (new Date(current.created_at) > new Date(latest.created_at) ? current : latest),
                                     group.messages[0],
@@ -376,7 +353,6 @@ export default function Messages() {
     );
 }
 
-// Simplified AttachmentViewer (unchanged, but added error logging)
 function AttachmentViewer({ filePath }: { filePath: string }) {
     const [previewError, setPreviewError] = useState(false);
     const ext = filePath.split('.').pop()?.toLowerCase() || '';
@@ -387,7 +363,6 @@ function AttachmentViewer({ filePath }: { filePath: string }) {
     const textExts = ['txt', 'csv', 'log', 'md'];
 
     if (previewError) {
-        console.warn('Attachment preview failed for:', filePath); // Debug
         return (
             <div>
                 <a href={filePath} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">
@@ -399,7 +374,6 @@ function AttachmentViewer({ filePath }: { filePath: string }) {
     }
 
     const handleError = () => {
-        console.error('Error loading attachment:', filePath); // Debug
         setPreviewError(true);
     };
 

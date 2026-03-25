@@ -84,6 +84,11 @@ function Calendar({
       className={cn("w-fit", className)}
       classNames={mergedClassNames}
       components={mergedComponents}
+      disabled={(day) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return day < today;
+      }}
       {...props}
     />
   )

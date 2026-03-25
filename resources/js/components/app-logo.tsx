@@ -8,7 +8,7 @@ export default function AppLogo() {
             </div>
             <div className="ml-1 grid flex-1 text-left text-sm">
                 <span>
-                    <img src="/storage/Ramils Creation.png" alt="" />
+                    <img src="/images/ramilLogo.svg" alt="Ramil's Creation" className="mr-2 h-5.5 dark:invert" />
                 </span>{' '}
             </div>
         </>

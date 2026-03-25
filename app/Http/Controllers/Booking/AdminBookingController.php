@@ -35,7 +35,7 @@ class AdminBookingController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Bookings::with(['services', 'packages', 'payment'])->latest();
+        $query = Bookings::with(['payment', 'bookingSelectedServices'])->latest();
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -118,7 +118,7 @@ class AdminBookingController extends Controller
             }
         }
 
-        return Inertia::render('Booking/add-new-booking', [
+        return Inertia::render('add-booking', [
             'packages' => $packages,
             'bookedTimes' => $bookedTimes,
             'blockedtimes' => $blockedtimes,
@@ -182,10 +182,19 @@ class AdminBookingController extends Controller
 
         // Save selected services
         foreach ($validated['selected_services'] as $services_id) {
+            $service = Services::find($services_id);
             BookingSelectedServices::create([
                 'package_id' => $validated['package_id'],
                 'services_id' => $services_id,
                 'booking_id' => $booking->booking_id,
+                'package_name' => $package->package_name,
+                'package_description' => $package->package_description,
+                'package_price' => $package->package_price,
+                'package_promo' => $package->package_promo,
+                'discounted_price' => $package->discounted_price,
+                'service_name' => $service->service_name,
+                'service_description' => $service->service_description,
+                'service_image' => $service->image,
             ]);
         }
 
@@ -427,14 +436,26 @@ class AdminBookingController extends Controller
             $existingService = BookingSelectedServices::where('booking_id', $id)->first();
             $package_id = $existingService ? $existingService->package_id : ($booking->packages->first()->package_id ?? null);
 
+            // Fetch package data if package_id exists
+            $package = $package_id ? Package::find($package_id) : null;
+
             BookingSelectedServices::where('booking_id', $id)->delete();
 
             if (!empty($request->selected_services)) {
                 foreach ($request->selected_services as $serviceId) {
+                    $service = Services::find($serviceId);
                     BookingSelectedServices::create([
                         'booking_id' => $id,
                         'services_id' => $serviceId,
                         'package_id' => $package_id,
+                        'package_name' => $package ? $package->package_name : null,
+                        'package_description' => $package ? $package->package_description : null,
+                        'package_price' => $package ? $package->package_price : null,
+                        'package_promo' => $package ? $package->package_promo : null,
+                        'discounted_price' => $package ? $package->discounted_price : null,
+                        'service_name' => $service ? $service->service_name : null,
+                        'service_description' => $service ? $service->service_description : null,
+                        'service_image' => $service ? $service->image : null,
                     ]);
                 }
             }
@@ -548,9 +569,9 @@ class AdminBookingController extends Controller
         $payment->save();
     }
 
-    public function report(string $booking_id)
+    public function report(string $transaction_number)
     {
-        $booking = Bookings::with(['services', 'packages', 'payment'])->findOrFail($booking_id);
+        $booking = Bookings::withTrashed()->with(['payment', 'bookingSelectedServices'])->where('transaction_number', $transaction_number)->firstOrFail();
 
         $pdf = Pdf::loadView('pdfs.customer_booking_report', compact('booking'))
             ->setPaper('a4', 'portrait');

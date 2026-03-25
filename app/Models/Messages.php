@@ -44,23 +44,18 @@ class Messages extends Model
         ];
     }
 
-    /**
-     * Polymorphic relationship: Who sent this message (e.g., User/Admin).
-     */
+    
     public function sender(): MorphTo
     {
         return $this->morphTo('sender');
     }
 
-    /**
-     * Polymorphic relationship: Who received this message (e.g., Bookings/Customer or Staff).
-     */
+    
     public function receiver(): MorphTo
     {
         return $this->morphTo('receiver');
     }
 
-    // Optional: Accessors for convenience (e.g., get booking_id if receiver is Bookings)
     public function getBookingIdAttribute(): ?int
     {
         return $this->receiver_type === Bookings::class ? $this->receiver_id : null;

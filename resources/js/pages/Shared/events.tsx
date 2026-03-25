@@ -222,7 +222,7 @@ function BookingAccordion({
                         <AccordionTrigger className="p-5 hover:no-underline">
                             <div className="flex w-full items-start justify-between">
                                 <div>
-                                    <h3 className="text-base font-semibold text-gray-900">{booking.event_name}</h3>
+                                    <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">{booking.event_name}</h3>
                                     <p className="text-sm text-gray-500">
                                         {formatDateToWords(booking.event_date)} • {formatTimeTo12Hour(booking.event_time_from)}
                                     </p>
@@ -254,7 +254,6 @@ function BookingAccordion({
                         </AccordionTrigger>
                         <AccordionContent>
                             <CardContent className="border-t bg-gray-50/70 p-6">
-                                {/* INFO GRID */}
                                 <div className="grid grid-cols-1 gap-4 text-sm text-gray-700 sm:grid-cols-2">
                                     {[
                                         { label: 'Booking ID', value: booking.booking_id },
@@ -279,10 +278,8 @@ function BookingAccordion({
                                     )}
                                 </div>
 
-                                {/* DIVIDER */}
                                 <div className="my-6 border-t border-gray-200" />
 
-                                {/* ASSIGNED STAFF */}
                                 <div>
                                     <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-800">Assigned Staff</h4>
                                     {assignedStaff.length > 0 ? (
@@ -315,15 +312,11 @@ function BookingAccordion({
                             </CardContent>
                         </AccordionContent>
 
-                        <AccordionFooter className="rounded-b-xl border-t bg-gray-50/70">
-                            <div className="flex w-full items-center gap-3">
-                                {/* 👥 Overlapping Staff Avatars */}
-                                <div className="flex -space-x-2">
+                        <AccordionFooter className="rounded-b-xl border-t">
+                            <div className="flex w-full items-center gap-3 p-3">
+                                <div className="flex -space-x-[0.675rem]">
                                     {assignedStaff.slice(0, 5).map((assigned) => (
-                                        <Avatar
-                                            key={assigned.assigned_id}
-                                            className="m-3 rounded-full shadow-sm ring-2 ring-white transition-transform duration-150 hover:scale-105"
-                                        >
+                                        <Avatar key={assigned.assigned_id} className="h-9 w-9 rounded-full ring-2 ring-background">
                                             <AvatarImage src="" alt={assigned.staff.staff_name} />
                                             <AvatarFallback className="font-semibold text-white" style={{ backgroundColor: assigned.staff.color }}>
                                                 {assigned.staff.staff_name.charAt(0)}
@@ -331,15 +324,13 @@ function BookingAccordion({
                                         </Avatar>
                                     ))}
 
-                                    {/* ➕ Overflow Count */}
                                     {assignedStaff.length > 5 && (
-                                        <Avatar className="h-9 w-9 rounded-full bg-gray-200 text-gray-700 ring-2 ring-white">
+                                        <Avatar className="h-9 w-9 rounded-full bg-gray-200 ring-2 ring-background">
                                             <AvatarFallback>+{assignedStaff.length - 5}</AvatarFallback>
                                         </Avatar>
                                     )}
                                 </div>
 
-                                {/* 🧩 Assign Task Button */}
                                 <div className="ml-auto">
                                     <Sheet open={openSheet && selectedBooking?.booking_id === booking.booking_id} onOpenChange={setOpenSheet}>
                                         <SheetTrigger asChild>
@@ -356,12 +347,10 @@ function BookingAccordion({
                                             </Button>
                                         </SheetTrigger>
 
-                                        {/* 🗂 Sheet Content */}
                                         <SheetContent
                                             side="right"
                                             className="w-[440px] overflow-y-auto rounded-l-2xl bg-white p-6 shadow-xl sm:w-[500px]"
                                         >
-                                            {/* Header */}
                                             <SheetHeader className="mb-4 border-b pb-4">
                                                 <SheetTitle className="flex items-center gap-2 text-xl font-semibold text-gray-900">
                                                     🧾 Assign Staff
@@ -373,7 +362,6 @@ function BookingAccordion({
                                             </SheetHeader>
 
                                             <div className="space-y-6">
-                                                {/* 🧑‍💼 Currently Assigned */}
                                                 <div>
                                                     <p className="mb-3 text-sm font-semibold text-gray-700">Currently Assigned</p>
                                                     <div className="space-y-2">
@@ -417,7 +405,6 @@ function BookingAccordion({
                                                     </div>
                                                 </div>
 
-                                                {/* ➕ Add New Staff */}
                                                 <div>
                                                     <p className="mb-3 text-sm font-semibold text-gray-700">Add New Staff</p>
 
@@ -467,7 +454,6 @@ function BookingAccordion({
                                                     </Select>
                                                 </div>
 
-                                                {/* 📅 Availability */}
                                                 {currentSelectedStaff && (
                                                     <div className="mt-4 space-y-2">
                                                         <p className="text-sm font-semibold text-gray-700">
@@ -513,7 +499,6 @@ function BookingAccordion({
                                                     </div>
                                                 )}
 
-                                                {/* ⚙️ Action Buttons */}
                                                 <div className="flex gap-3 border-t pt-4">
                                                     {(() => {
                                                         const selectedStaffMember = staff.find((s) => s.staff_id === currentSelectedStaff);
@@ -558,8 +543,13 @@ function BookingAccordion({
                                                                         </DialogTitle>
                                                                         <DialogDescription>
                                                                             <div>
-                                                                                <p className='mb-4 mt-3'>Are you sure you want to add this staff because they are not available. </p>
-                                                                                <p className='text-sm '>Note: <i>You may change Staff's availability in Staff Module.</i></p>
+                                                                                <p className="mt-3 mb-4">
+                                                                                    Are you sure you want to add this staff because they are not
+                                                                                    available.{' '}
+                                                                                </p>
+                                                                                <p className="text-sm">
+                                                                                    Note: <i>You may change Staff's availability in Staff Module.</i>
+                                                                                </p>
                                                                             </div>
                                                                         </DialogDescription>
                                                                     </DialogHeader>

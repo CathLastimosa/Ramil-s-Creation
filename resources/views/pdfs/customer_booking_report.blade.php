@@ -86,14 +86,15 @@
       </table>
    </div>
 
+
       <!-- PACKAGE -->
     <div class="section">
         <h3>Package</h3>
-        @if($booking->packages->count() > 0)
+        @if($booking->bookingSelectedServices->count() > 0)
             @php
-                $package = $booking->packages->first();
+                $selectedService = $booking->bookingSelectedServices->first();
             @endphp
-            <p><strong>{{ $package->package_name }}</strong> - {{ $package->package_price }}</p>
+            <p><strong>{{ $selectedService->package_name }}</strong> - ₱{{ number_format($selectedService->discounted_price, 2) }}</p>
         @else
             <p>No package selected.</p>
         @endif
@@ -102,12 +103,21 @@
    <!-- SERVICES -->
    <div class="section">
       <h3>Selected Services</h3>
-      @if($booking->services->count() > 0)
-         <ul>
-            @foreach($booking->services as $service)
-               <li>{{ $service->service_name }} - {{ $service->description }}</li>
-            @endforeach
-         </ul>
+      @if($booking->bookingSelectedServices->count() > 0)
+         <table>
+            <thead>
+               <tr>
+                  <th>Service Name</th>
+               </tr>
+            </thead>
+            <tbody>
+               @foreach($booking->bookingSelectedServices as $selectedService)
+                  <tr>
+                     <td>{{ $selectedService->service_name }}</td>
+                  </tr>
+               @endforeach
+            </tbody>
+         </table>
       @else
          <p>No services selected.</p>
       @endif

@@ -15,7 +15,6 @@ const PackagesSection: React.FC = () => {
             theme: 'Where Love Stories Become Forever Memories',
             tagline: 'Celebrating the beginning of your forever',
             packageName: 'Wedding Package',
-            packageId: 'PKG-001',
             description: 'Your dream wedding brought to life with exquisite planning, stunning venues, and memories that last a lifetime.',
         },
         {
@@ -24,7 +23,6 @@ const PackagesSection: React.FC = () => {
             theme: 'Where Debut Dreams Sparkle with Magic',
             tagline: 'A day to remember, filled with elegance and wonder',
             packageName: 'Debut Package',
-            packageId: 'PKG-002',
             description:
                 'Transform your special day into an unforgettable magical experience with our exclusive debut package. Every detail crafted to perfection.',
         },
@@ -33,7 +31,7 @@ const PackagesSection: React.FC = () => {
     const currentPackage = packagesData[currentPackageIndex];
 
     return (
-        <section id="packages" className="overflow-hidden bg-white pt-16 sm:py-10 lg:py-40 lg:pt-0">
+        <section id="packages" className="overflow-hidden bg-white sm:py-10 lg:py-30">
             <div className="max-w-10xl mx-auto px-6 sm:px-8 lg:px-1">
                 <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-5">
                     {/* LEFT COLUMN - CAROUSEL */}
@@ -81,7 +79,7 @@ const PackagesSection: React.FC = () => {
                             viewport={{ amount: 0.2 }}
                             className="body-medium w-full py-4 font-heading sm:w-3/4 lg:w-auto"
                         >
-                            <ButtonPrimary href={`/booking/${currentPackage.packageId}/services`} className="w-full text-center sm:w-3/4 lg:w-auto">
+                            <ButtonPrimary href="/booking/PKG-001/services" className="mb-4 w-full sm:mb-0 sm:w-auto">
                                 Book Now
                             </ButtonPrimary>
                         </motion.div>

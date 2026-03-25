@@ -17,6 +17,9 @@ const FeedbackPage: React.FC = () => {
         booking_id: string;
         errors: Record<string, string>;
     }>().props;
+    useEffect(() => {
+        document.documentElement.classList.remove('dark');
+    }, []);
 
     console.log('Props received:', { booking_id, flash, errors });
 

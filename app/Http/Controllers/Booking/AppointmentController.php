@@ -6,11 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Appointment\StoreAppointmentRequest;
 use App\Models\Appointments;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\EmailNotification;
+use App\Models\BlockedDate;
 use App\Jobs\SendAppointmentNotification;
 use App\Events\AppointmentCreated;
+
 class AppointmentController extends Controller
 {
     /**
@@ -35,8 +36,25 @@ class AppointmentController extends Controller
             }
         }
 
+        $blockdates = BlockedDate::select('date_id', 'date', 'start_time', 'end_time')
+            ->get()
+            ->groupBy('date');
+
+        // Format block dates
+        $blockedtimes = [];
+        foreach ($blockdates as $items) {
+            foreach ($items as $row) {
+                $date = Carbon::parse($row->date)->format('Y-m-d');
+                $blockedtimes[$date][] = [
+                    'from' => Carbon::parse($row->start_time)->format('H:i'),
+                    'to' => Carbon::parse($row->end_time)->format('H:i'),
+                ];
+            }
+        }
+
         return Inertia::render('Appointment', [
             'appointmentTimes' => $appointmentTimes,
+            'blockedtimes' => $blockedtimes,
         ]);
     }
 
@@ -65,7 +83,7 @@ class AppointmentController extends Controller
             'status' => 'reserved',
         ]);
 
-         $notification = EmailNotification::create([
+        $notification = EmailNotification::create([
             'subject' => 'Appointment Submitted',
             'recipient_type' => 'customer',
             'recipient_id' => $appointment->appointment_id,
@@ -74,10 +92,10 @@ class AppointmentController extends Controller
             'status' => 'pending',
         ]);
 
-        SendAppointmentNotification::dispatch( $appointment, $notification->id);
+        SendAppointmentNotification::dispatch($appointment, $notification->id);
 
         event(new AppointmentCreated($appointment));
-        
+
         return redirect()->back()->with('success', [
             'message' => 'Thank you for booking an appointment with us!',
             'appointment' => [
@@ -86,5 +104,4 @@ class AppointmentController extends Controller
             ],
         ]);
     }
-
 }

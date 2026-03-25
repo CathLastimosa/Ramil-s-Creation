@@ -79,7 +79,6 @@ class PackagesController extends Controller
                 ->with('error', 'Services are not added in this package. Please complete Step 2.');
         }
 
-        // Generate Package ID
         $packageId = 'PKG-' . str_pad(Package::count() + 1, 3, '0', STR_PAD_LEFT);
 
         $package = Package::create([
@@ -90,40 +89,33 @@ class PackagesController extends Controller
             'package_price' => $packageData['packagePrice'],
             'package_promo' => $packageData['packagePromo'],
             'discounted_price' => $packageData['discountedPrice'],
-            'services_count' => $servicesCount,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        // Loop through all services in session
         foreach ($servicesData as $index => $serviceData) {
-            $lastService = Services::orderBy('services_id', 'desc')->first(); // Get the last service
+            $lastService = Services::orderBy('services_id', 'desc')->first(); 
 
             if ($lastService) {
-                // Extract the numeric part from SRV-XXX
-                $lastNumber = (int) str_replace('SRV-', '', $lastService->services_id); // Get the last service number
-                $nextNumber = $lastNumber + 1; // Increment the service number
+                $lastNumber = (int) str_replace('SRV-', '', $lastService->services_id); 
+                $nextNumber = $lastNumber + 1; 
             } else {
-                $nextNumber = 1; // First record
+                $nextNumber = 1;
             }
 
-            $serviceId = 'SRV-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT); // Generate service ID
+            $serviceId = 'SRV-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT); 
 
-            // Handle Base64 image from session
             $relativePath = null;
             if (! empty($serviceData['image']) && str_starts_with($serviceData['image'], 'data:image')) {
-                // Extract MIME type and base64 data
                 preg_match('/^data:image\/(\w+);base64,/', $serviceData['image'], $matches);
-                $extension = $matches[1] ?? 'png'; // default to png
+                $extension = $matches[1] ?? 'png'; 
                 $imageData = substr($serviceData['image'], strpos($serviceData['image'], ',') + 1);
                 $imageData = base64_decode($imageData);
 
-                // Save to storage
                 $fileName = time() . "_{$index}." . $extension;
                 $relativePath = 'services/' . $fileName;
                 Storage::disk('public')->put($relativePath, $imageData);
             } elseif (! empty($serviceData['image']) && is_string($serviceData['image'])) {
-                // Already stored file path
                 $relativePath = $serviceData['image'];
             }
 
@@ -131,15 +123,19 @@ class PackagesController extends Controller
                 'services_id' => $serviceId,
                 'service_name' => $serviceData['serviceName'],
                 'description' => $serviceData['serviceDescription'],
-                'image' => $relativePath,  // handle actual image saving in store step
+                'image' => $relativePath,  
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
             $package->services()->attach($service->services_id);
-
-            session()->forget(['package', 'services']);
         }
+
+        $package->load('services');
+        $actualServicesCount = $package->services->count();
+        $package->update(['services_count' => $actualServicesCount]);
+
+        session()->forget(['package', 'services']);
 
         if (! empty($packageData['announceEmail'])) {
             $emails = Bookings::whereNotNull('contact_email')

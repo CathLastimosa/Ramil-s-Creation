@@ -208,7 +208,7 @@ export default function EditBooking({
                                         <CardTitle className="mb-4 text-base font-medium">Available Time Slots for {date.toDateString()}</CardTitle>
 
                                         {(() => {
-                                            let flatIdx = 0; // flat index across all groups
+                                            let flatIdx = 0; 
                                             return Object.entries(
                                                 bookingSlots.reduce(
                                                     (groups, slot) => {
