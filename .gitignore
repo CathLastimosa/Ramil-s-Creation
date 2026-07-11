@@ -1,24 +1,89 @@
-/.phpunit.cache
-/bootstrap/ssr
+# ==========================
+# Environment
+# ==========================
+.env
+.env.*
+!.env.example
+
+# ==========================
+# Dependencies
+# ==========================
+/vendor
 /node_modules
+
+# ==========================
+# Build & Vite
+# ==========================
 /public/build
 /public/hot
+/bootstrap/ssr
+
+# ==========================
+# Laravel Storage
+# ==========================
 /public/storage
 /storage/*.key
 /storage/pail
-/vendor
-.env
-.env.backup
-.env.production
-.phpactor.json
+/storage/logs/*
+!/storage/logs/.gitignore
+
+/storage/framework/cache/*
+!/storage/framework/cache/.gitignore
+
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+
+/storage/framework/testing/*
+!/storage/framework/testing/.gitignore
+
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+
+# ==========================
+# PHPUnit
+# ==========================
+/.phpunit.cache
 .phpunit.result.cache
-Homestead.json
-Homestead.yaml
-npm-debug.log
-yarn-error.log
+
+# ==========================
+# Composer
+# ==========================
 /auth.json
+composer.phar
+
+# ==========================
+# IDEs & Editors
+# ==========================
 /.fleet
 /.idea
 /.nova
 /.vscode
 /.zed
+*.swp
+*.swo
+
+# ==========================
+# Laravel Homestead
+# ==========================
+Homestead.json
+Homestead.yaml
+
+# ==========================
+# Logs
+# ==========================
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# ==========================
+# OS Files
+# ==========================
+.DS_Store
+Thumbs.db
+
+# ==========================
+# Misc
+# ==========================
+*.sqlite
